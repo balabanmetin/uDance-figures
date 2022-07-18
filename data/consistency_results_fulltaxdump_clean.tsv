@@ -1,0 +1,460 @@
+10k.concat	d	Archaea	657	1.000
+10k.concat	d	Bacteria	9869	1.000
+10k.concat	p	DPANN	9	0.556
+10k.concat	p	Asgard	8	0.875
+10k.concat	p	Diaforarchaea	43	0.519
+10k.concat	p	Stenosarchaea	233	0.860
+10k.concat	p	Ca. Hydrothermarchaeota	1	1.000
+10k.concat	p	Euryarchaeota	75	0.533
+10k.concat	p	Methanomada	53	1.000
+10k.concat	p	TACK	235	0.992
+10k.concat	p	Ca. Wirthbacteria	1	1.000
+10k.concat	p	Ca. Abawacabacteria	1	1.000
+10k.concat	p	Ca. Peregrinibacteria	55	0.917
+10k.concat	p	Ca. Peribacteraceae	5	1.000
+10k.concat	p	Ca. Dojkabacteria	13	1.000
+10k.concat	p	Ca. WWE3	62	1.000
+10k.concat	p	Ca. CPR3	3	1.000
+10k.concat	p	Microgenomates	421	0.995
+10k.concat	p	Proteobacteria	2885	0.936
+10k.concat	p	Ca. Dependentiae	22	0.955
+10k.concat	p	Ca. Berkelbacteria	8	1.000
+10k.concat	p	Ca. CPR2	6	1.000
+10k.concat	p	Ca. Kazan-3B-28	8	1.000
+10k.concat	p	Ca. Saccharibacteria	18	1.000
+10k.concat	p	Ca. Doudnabacteria	19	1.000
+10k.concat	p	Parcubacteria	825	0.977
+10k.concat	p	Ca. Wallbacteria	1	1.000
+10k.concat	p	Ca. Riflebacteria	1	1.000
+10k.concat	p	Ca. KD3-62	1	1.000
+10k.concat	p	Ca. Fervidibacteria	3	1.000
+10k.concat	p	Terrabacteria	3646	0.958
+10k.concat	p	Spirochaetes	135	0.993
+10k.concat	p	Ca. Fraserbacteria	1	1.000
+10k.concat	p	Ca. Bipolaricaulota	7	1.000
+10k.concat	p	PVC	272	0.617
+10k.concat	p	Acidobacteria	56	0.965
+10k.concat	p	Ca. Atribacteria	4	0.750
+10k.concat	p	Synergistetes	30	0.967
+10k.concat	p	Dictyoglomi	2	1.000
+10k.concat	p	Caldiserica/Cryosericota	2	1.000
+10k.concat	p	Coprothermobacterota	3	1.000
+10k.concat	p	Thermotogae	35	1.000
+10k.concat	p	Fusobacteria	36	1.000
+10k.concat	p	FCB	982	0.939
+10k.concat	p	Ca. Desantisbacteria	1	1.000
+10k.concat	p	Ca. Aerophobetes	3	1.000
+10k.concat	p	Ca. Firestonebacteria	1	1.000
+10k.concat	p	Elusimicrobia	29	1.000
+10k.concat	p	Ca. Raymondbacteria	1	1.000
+10k.concat	p	Ca. Eisenbacteria	1	1.000
+10k.concat	p	Ca. Coatesbacteria	1	1.000
+10k.concat	p	Ca. Glassbacteria	3	1.000
+10k.concat	p	Ca. Delongbacteria	1	1.000
+10k.concat	p	Ca. Edwardsbacteria	1	1.000
+10k.concat	p	Ca. TA06	7	0.571
+10k.concat	p	Ca. WOR-3	2	1.000
+10k.concat	p	Ca. Pyropristinus	3	1.000
+10k.concat	p	Ca. Hydrothermae	6	0.833
+10k.concat	p	Calditrichaeota	2	1.000
+10k.concat	p	Deferribacteres	8	0.875
+10k.concat	p	Ca. KSB1	1	1.000
+10k.concat	p	Ca. Sumerlaeota	2	0.500
+10k.concat	p	Ca. Lindowbacteria	1	1.000
+10k.concat	p	Ca. Poribacteria	3	1.000
+10k.concat	p	Ca. NC10	3	1.000
+10k.concat	p	Ca. Schekmanbacteria	8	0.875
+10k.concat	p	Ca. Fischerbacteria	1	1.000
+10k.concat	p	Ca. Aminicenantes	8	1.000
+10k.concat	p	Chrysiogenetes	2	1.000
+10k.concat	p	Aquificae	17	0.941
+10k.concat	p	Ca. Calescamantes	7	0.875
+10k.concat	p	Ca. Dadabacteria	2	1.000
+10k.concat	p	Nitrospinae/Tectomicrobia	18	0.889
+10k.concat	p	Nitrospirae	55	0.982
+10k.concat	p	Thermodesulfobacteria	10	1.000
+10k.concat	p	PS1	2	1.000
+10k.concat	p	OM43	1	1.000
+10k.concat	p	sulfur-oxidizing_symbionts	38	0.833
+10k.concat	p	BD1-7	1	1.000
+10k.concat	p	SAR92	4	0.667
+10k.concat	p	ATMA endosymbionts	15	0.400
+10k.concat	p	Ca. Baumannia	3	1.000
+10k.astral	d	Archaea	657	1.000
+10k.astral	d	Bacteria	9869	1.000
+10k.astral	p	DPANN	9	0.556
+10k.astral	p	Asgard	8	0.875
+10k.astral	p	Euryarchaeota	75	0.507
+10k.astral	p	Stenosarchaea	233	0.860
+10k.astral	p	TACK	235	0.992
+10k.astral	p	Ca. Hydrothermarchaeota	1	1.000
+10k.astral	p	Methanomada	53	1.000
+10k.astral	p	Diaforarchaea	43	0.796
+10k.astral	p	Ca. Wirthbacteria	1	1.000
+10k.astral	p	Ca. Dojkabacteria	13	1.000
+10k.astral	p	Ca. WWE3	62	1.000
+10k.astral	p	Ca. CPR3	3	1.000
+10k.astral	p	Microgenomates	421	0.995
+10k.astral	p	Ca. Dependentiae	22	0.955
+10k.astral	p	Proteobacteria	2885	0.909
+10k.astral	p	Ca. Abawacabacteria	1	1.000
+10k.astral	p	Ca. Peregrinibacteria	55	0.917
+10k.astral	p	Ca. Peribacteraceae	5	1.000
+10k.astral	p	Ca. Berkelbacteria	8	1.000
+10k.astral	p	Ca. Kazan-3B-28	8	1.000
+10k.astral	p	Ca. CPR2	6	1.000
+10k.astral	p	Ca. Saccharibacteria	18	1.000
+10k.astral	p	Parcubacteria	825	0.977
+10k.astral	p	Ca. Doudnabacteria	19	1.000
+10k.astral	p	Terrabacteria	3646	0.996
+10k.astral	p	Dictyoglomi	2	1.000
+10k.astral	p	Caldiserica/Cryosericota	2	1.000
+10k.astral	p	Coprothermobacterota	3	1.000
+10k.astral	p	Thermotogae	35	1.000
+10k.astral	p	Ca. Wallbacteria	1	1.000
+10k.astral	p	Ca. Fraserbacteria	1	1.000
+10k.astral	p	Ca. Bipolaricaulota	7	1.000
+10k.astral	p	Ca. Atribacteria	4	0.750
+10k.astral	p	Synergistetes	30	0.967
+10k.astral	p	Spirochaetes	135	0.993
+10k.astral	p	Ca. Riflebacteria	1	1.000
+10k.astral	p	Ca. Fervidibacteria	3	1.000
+10k.astral	p	Ca. KD3-62	1	1.000
+10k.astral	p	PVC	272	0.989
+10k.astral	p	Acidobacteria	56	0.965
+10k.astral	p	FCB	982	0.981
+10k.astral	p	Fusobacteria	36	1.000
+10k.astral	p	Ca. Aerophobetes	3	1.000
+10k.astral	p	Ca. Lindowbacteria	1	1.000
+10k.astral	p	Elusimicrobia	29	1.000
+10k.astral	p	Ca. Coatesbacteria	1	1.000
+10k.astral	p	Ca. Sumerlaeota	2	1.000
+10k.astral	p	Ca. Poribacteria	3	1.000
+10k.astral	p	Ca. Firestonebacteria	1	1.000
+10k.astral	p	Ca. Desantisbacteria	1	1.000
+10k.astral	p	Ca. Edwardsbacteria	1	1.000
+10k.astral	p	Ca. TA06	7	0.571
+10k.astral	p	Ca. WOR-3	2	1.000
+10k.astral	p	Ca. Pyropristinus	3	1.000
+10k.astral	p	Ca. Hydrothermae	6	0.833
+10k.astral	p	Ca. Eisenbacteria	1	1.000
+10k.astral	p	Ca. Glassbacteria	3	1.000
+10k.astral	p	Ca. Raymondbacteria	1	1.000
+10k.astral	p	Ca. Delongbacteria	1	1.000
+10k.astral	p	Calditrichaeota	2	1.000
+10k.astral	p	Deferribacteres	8	0.875
+10k.astral	p	Ca. KSB1	1	1.000
+10k.astral	p	Chrysiogenetes	2	1.000
+10k.astral	p	Aquificae	17	0.941
+10k.astral	p	Ca. Calescamantes	7	0.875
+10k.astral	p	Ca. Fischerbacteria	1	1.000
+10k.astral	p	Ca. Aminicenantes	8	1.000
+10k.astral	p	Ca. Schekmanbacteria	8	0.875
+10k.astral	p	Nitrospinae/Tectomicrobia	18	0.889
+10k.astral	p	Nitrospirae	55	0.818
+10k.astral	p	Ca. NC10	3	1.000
+10k.astral	p	Ca. Dadabacteria	2	1.000
+10k.astral	p	Thermodesulfobacteria	10	1.000
+10k.astral	p	PS1	2	1.000
+10k.astral	p	OM43	1	1.000
+10k.astral	p	sulfur-oxidizing_symbionts	38	0.833
+10k.astral	p	BD1-7	1	1.000
+10k.astral	p	SAR92	4	0.800
+10k.astral	p	ATMA endosymbionts	15	0.382
+10k.astral	p	Ca. Baumannia	3	1.000
+16k.uDance	d	Archaea	876	0.966
+16k.uDance	d	Bacteria	14818	1.000
+16k.uDance	p	DPANN	28	0.966
+16k.uDance	p	Euryarchaeota	103	0.408
+16k.uDance	p	Stenosarchaea	298	0.875
+16k.uDance	p	Asgard	20	1.000
+16k.uDance	p	TACK	253	0.996
+16k.uDance	p	Ca. Hydrothermarchaeota	1	1.000
+16k.uDance	p	Methanomada	75	1.000
+16k.uDance	p	Diaforarchaea	97	0.789
+16k.uDance	p	Proteobacteria	4315	0.894
+16k.uDance	p	Marine_Group_IV	1	1.000
+16k.uDance	p	Ca. Wirthbacteria	1	1.000
+16k.uDance	p	Ca. Abawacabacteria	1	1.000
+16k.uDance	p	Ca. Peregrinibacteria	74	0.948
+16k.uDance	p	Ca. Gracilibacteria	6	0.500
+16k.uDance	p	Ca. SR1	1	1.000
+16k.uDance	p	Parcubacteria	1061	0.978
+16k.uDance	p	Ca. Peribacteraceae	2	0.500
+16k.uDance	p	Ca. Kazan-3B-28	8	1.000
+16k.uDance	p	Ca. WS5	1	1.000
+16k.uDance	p	Ca. CPR2	6	1.000
+16k.uDance	p	Ca. Saccharibacteria	69	0.971
+16k.uDance	p	Terrabacteria	5321	0.993
+16k.uDance	p	Ca. Berkelbacteria	19	0.905
+16k.uDance	p	Ca. WS2	1	1.000
+16k.uDance	p	Ca. Doudnabacteria	19	1.000
+16k.uDance	p	Ca. Dojkabacteria	24	1.000
+16k.uDance	p	Ca. CPR3	6	0.667
+16k.uDance	p	Ca. WWE3	75	0.947
+16k.uDance	p	Microgenomates	488	0.998
+16k.uDance	p	Dictyoglomi	3	1.000
+16k.uDance	p	Coprothermobacterota	2	1.000
+16k.uDance	p	Caldiserica/Cryosericota	5	1.000
+16k.uDance	p	Thermotogae	45	1.000
+16k.uDance	p	Ca. Atribacteria	12	1.000
+16k.uDance	p	Synergistetes	33	1.000
+16k.uDance	p	Fusobacteria	40	0.975
+16k.uDance	p	Ca. Lindowbacteria	1	1.000
+16k.uDance	p	Spirochaetes	173	0.994
+16k.uDance	p	PVC	635	0.888
+16k.uDance	p	Ca. Aerophobetes	5	0.600
+16k.uDance	p	Ca. Sumerlaeota	2	1.000
+16k.uDance	p	FCB	1640	0.972
+16k.uDance	p	Nitrospirae	89	0.944
+16k.uDance	p	Ca. Coatesbacteria	1	1.000
+16k.uDance	p	Ca. Poribacteria	11	1.000
+16k.uDance	p	Elusimicrobia	55	0.946
+16k.uDance	p	Ca. Edwardsbacteria	1	1.000
+16k.uDance	p	Ca. TA06	10	0.500
+16k.uDance	p	Ca. WOR-3	13	0.600
+16k.uDance	p	Ca. Hydrothermae	5	0.800
+16k.uDance	p	Ca. Pyropristinus	3	1.000
+16k.uDance	p	Ca. Eisenbacteria	4	1.000
+16k.uDance	p	Ca. Glassbacteria	3	1.000
+16k.uDance	p	OMG	12	0.357
+16k.uDance	p	Ca. Raymondbacteria	1	1.000
+16k.uDance	p	Ca. Delongbacteria	2	1.000
+16k.uDance	p	Calditrichaeota	5	0.600
+16k.uDance	p	Deferribacteres	9	0.889
+16k.uDance	p	Ca. KSB1	3	0.500
+16k.uDance	p	Ca. Handelsmanbacteria	1	1.000
+16k.uDance	p	Ca. FCPU426	1	1.000
+16k.uDance	p	Ca. NPL-UPA2	1	1.000
+16k.uDance	p	Ca. Firestonebacteria	2	1.000
+16k.uDance	p	Ca. Desantisbacteria	5	0.800
+16k.uDance	p	Thermodesulfobacteria	14	1.000
+16k.uDance	p	Chrysiogenetes	2	1.000
+16k.uDance	p	Ca. UBP10	1	1.000
+16k.uDance	p	Ca. Dadabacteria	11	0.818
+16k.uDance	p	Nitrospinae/Tectomicrobia	24	0.840
+16k.uDance	p	Ca. Schekmanbacteria	8	0.875
+16k.uDance	p	Ca. KSB3	1	1.000
+16k.uDance	p	Ca. Rokubacteria	10	1.000
+16k.uDance	p	Ca. NC10	4	0.800
+16k.uDance	p	Acidobacteria	155	0.930
+16k.uDance	p	Ca. Aminicenantes	15	1.000
+16k.uDance	p	Ca. Fischerbacteria	1	1.000
+16k.uDance	p	Acidobacteria_subdivision_22	1	1.000
+16k.uDance	p	Aquificae	21	0.905
+16k.uDance	p	Ca. Calescamantes	9	0.900
+16k.uDance	p	Ca. Dependentiae	26	0.963
+16k.uDance	p	sulfur-oxidizing_symbionts	34	0.674
+16k.uDance	p	BD1-7	3	0.333
+16k.uDance	p	SAR92	8	0.600
+16k.uDance	p	ATMA endosymbionts	17	0.286
+16k.uDance	p	Ca. Baumannia	3	1.000
+16k.uDance	p	OM43	2	0.667
+16k.uDance	p	PS1	2	1.000
+16k.uDance	p	Ca. Riflebacteria	1	1.000
+16k.uDance	p	Ca. Ozemobacterales	1	1.000
+16k.uDance	p	Ca. KD3-62	1	1.000
+16k.uDance	p	Ca. Fervidibacteria	3	1.000
+200k.uDance	d	Bacteria	193367	1.000
+200k.uDance	d	Archaea	4564	0.996
+200k.uDance	p	Ca. Wirthbacteria	2	1.000
+200k.uDance	p	Ca. CPR3	10	0.500
+200k.uDance	p	Ca. WWE3	129	0.917
+200k.uDance	p	Ca. CPR1	2	0.500
+200k.uDance	p	Ca. Saccharibacteria	245	0.976
+200k.uDance	p	Proteobacteria	91308	0.975
+200k.uDance	p	Microgenomates	902	0.990
+200k.uDance	p	Terrabacteria	76173	0.998
+200k.uDance	p	Parcubacteria	2111	0.987
+200k.uDance	p	DPANN	446	0.918
+200k.uDance	p	Ca. Dojkabacteria	51	0.981
+200k.uDance	p	Ca. Berkelbacteria	52	0.911
+200k.uDance	p	Ca. Kazan-3B-28	10	1.000
+200k.uDance	p	Ca. WS5	1	1.000
+200k.uDance	p	Ca. CPR2	10	1.000
+200k.uDance	p	Ca. WS2	1	1.000
+200k.uDance	p	Ca. Aminicenantes	105	0.928
+200k.uDance	p	Ca. Gracilibacteria	24	0.583
+200k.uDance	p	Ca. Doudnabacteria	35	0.946
+200k.uDance	p	Ca. SR1	7	0.500
+200k.uDance	p	FCB	13150	0.976
+200k.uDance	p	Spirochaetes	1448	0.987
+200k.uDance	p	Calditrichaeota	39	0.524
+200k.uDance	p	Ca. Abawacabacteria	2	1.000
+200k.uDance	p	Ca. Peregrinibacteria	110	0.885
+200k.uDance	p	Ca. Peribacteraceae	8	0.364
+200k.uDance	p	Nitrospirae	399	0.928
+200k.uDance	p	Dictyoglomi	13	0.923
+200k.uDance	p	PVC	3147	0.924
+200k.uDance	p	Fusobacteria	279	0.975
+200k.uDance	p	Ca. Riflebacteria	9	0.818
+200k.uDance	p	Ca. Ozemobacterales	1	1.000
+200k.uDance	p	Acidobacteria	983	0.963
+200k.uDance	p	Ca. KD3-62	1	1.000
+200k.uDance	p	Ca. Fervidibacteria	6	1.000
+200k.uDance	p	Caldiserica/Cryosericota	28	0.897
+200k.uDance	p	Ca. Atribacteria	62	0.984
+200k.uDance	p	Ca. Fraserbacteria	1	1.000
+200k.uDance	p	Ca. Bipolaricaulota	25	0.520
+200k.uDance	p	Aquificae	84	0.895
+200k.uDance	p	Stenosarchaea	1101	0.848
+200k.uDance	p	Ca. Lindowbacteria	2	1.000
+200k.uDance	p	Synergistetes	145	0.993
+200k.uDance	p	Coprothermobacterota	7	1.000
+200k.uDance	p	Thermotogae	198	0.995
+200k.uDance	p	Ca. Sumerlaeota	16	0.611
+200k.uDance	p	Ca. Aerophobetes	24	0.846
+200k.uDance	p	Euryarchaeota	642	0.255
+200k.uDance	p	Ca. Desantisbacteria	13	0.615
+200k.uDance	p	Ca. TA06	15	0.400
+200k.uDance	p	Elusimicrobia	192	0.931
+200k.uDance	p	Ca. NPL-UPA2	1	1.000
+200k.uDance	p	Ca. Calescamantes	16	0.882
+200k.uDance	p	Ca. FCPU426	3	1.000
+200k.uDance	p	Ca. Firestonebacteria	5	1.000
+200k.uDance	p	Ca. Poribacteria	69	1.000
+200k.uDance	p	Asgard	90	0.887
+200k.uDance	p	Ca. Coatesbacteria	5	0.600
+200k.uDance	p	Ca. Edwardsbacteria	6	1.000
+200k.uDance	p	Ca. WOR-3	52	0.684
+200k.uDance	p	Ca. Hydrothermae	9	0.364
+200k.uDance	p	Ca. Pyropristinus	3	1.000
+200k.uDance	p	Ca. GN15	1	1.000
+200k.uDance	p	Ca. Eisenbacteria	15	1.000
+200k.uDance	p	Ca. Glassbacteria	3	1.000
+200k.uDance	p	OMG	57	0.333
+200k.uDance	p	Ca. Raymondbacteria	7	1.000
+200k.uDance	p	Ca. KSB1	23	0.465
+200k.uDance	p	Deferribacteres	24	0.958
+200k.uDance	p	Ca. Delongbacteria	7	0.778
+200k.uDance	p	Krumholzibacteriota	1	1.000
+200k.uDance	p	Ca. Rokubacteria	93	0.989
+200k.uDance	p	Ca. Dependentiae	49	0.887
+200k.uDance	p	Ca. Handelsmanbacteria	6	0.375
+200k.uDance	p	Chrysiogenetes	5	0.400
+200k.uDance	p	Ca. NC10	20	0.952
+200k.uDance	p	Ca. Fischerbacteria	1	1.000
+200k.uDance	p	Acidobacteria_subdivision_22	1	1.000
+200k.uDance	p	Acidobacteria_subdivision_13	1	1.000
+200k.uDance	p	Acidobacteria_subdivision_2	1	1.000
+200k.uDance	p	Nitrospinae/Tectomicrobia	83	0.736
+200k.uDance	p	Ca. KSB3	3	1.000
+200k.uDance	p	Ca. Schekmanbacteria	8	0.875
+200k.uDance	p	Ca. UBP10	3	0.333
+200k.uDance	p	Ca. Dadabacteria	48	0.745
+200k.uDance	p	Thermodesulfobacteria	53	0.887
+200k.uDance	p	Ca. Mcinerneyibacteriota	1	1.000
+200k.uDance	p	TACK	1146	0.989
+200k.uDance	p	sulfur-oxidizing_symbionts	83	0.590
+200k.uDance	p	ATMA endosymbionts	37	0.462
+200k.uDance	p	Ca. Baumannia	4	1.000
+200k.uDance	p	SAR92	30	0.414
+200k.uDance	p	BD1-7	6	0.500
+200k.uDance	p	Ca. Porisulfidus	1	1.000
+200k.uDance	p	OM43	6	0.286
+200k.uDance	p	PS1	5	0.211
+200k.uDance	p	Ca. MSBL1	17	1.000
+200k.uDance	p	Ca. Hydrothermarchaeota	5	0.556
+200k.uDance	p	Methanomada	357	0.994
+200k.uDance	p	Diaforarchaea	754	0.666
+200k.uDance	p	Marine_Group_IV	4	0.667
+200k.uDance	p	DHVE6	1	1.000
+200k.uDance	p	Ca. pMC2A384	1	1.000
+GTDB	d	Archaea	2004	0.998
+GTDB	d	Bacteria	38110	1.000
+GTDB	p	Stenosarchaea	592	0.884
+GTDB	p	Euryarchaeota	274	0.279
+GTDB	p	Marine_Group_IV	2	0.667
+GTDB	p	Diaforarchaea	264	0.627
+GTDB	p	PVC	1337	0.554
+GTDB	p	Proteobacteria	13481	0.961
+GTDB	p	TACK	472	0.994
+GTDB	p	DPANN	216	0.709
+GTDB	p	Asgard	44	0.957
+GTDB	p	Methanomada	138	0.958
+GTDB	p	Ca. Hydrothermarchaeota	1	1.000
+GTDB	p	Ca. pMC2A384	1	1.000
+GTDB	p	Spirochaetes	450	0.976
+GTDB	p	FCB	5244	0.973
+GTDB	p	Ca. Lindowbacteria	1	1.000
+GTDB	p	Ca. Wallbacteria	1	1.000
+GTDB	p	Ca. Riflebacteria	6	0.750
+GTDB	p	Ca. Ozemobacterales	1	1.000
+GTDB	p	Terrabacteria	14666	0.996
+GTDB	p	Ca. Mcinerneyibacteriota	1	1.000
+GTDB	p	Ca. Sumerlaeota	13	0.615
+GTDB	p	Fusobacteria	75	0.960
+GTDB	p	Ca. Calescamantes	3	1.000
+GTDB	p	Ca. Dependentiae	26	0.926
+GTDB	p	Synergistetes	65	0.985
+GTDB	p	Ca. Fraserbacteria	3	1.000
+GTDB	p	Ca. Bipolaricaulota	20	0.952
+GTDB	p	Ca. Atribacteria	26	0.962
+GTDB	p	Thermotogae	71	1.000
+GTDB	p	Dictyoglomi	5	1.000
+GTDB	p	Caldiserica/Cryosericota	17	0.941
+GTDB	p	Coprothermobacterota	4	1.000
+GTDB	p	Ca. Peregrinibacteria	45	0.918
+GTDB	p	Ca. Peribacteraceae	3	0.333
+GTDB	p	Nitrospirae	185	0.898
+GTDB	p	Ca. Gracilibacteria	16	0.750
+GTDB	p	Ca. Abawacabacteria	1	1.000
+GTDB	p	Ca. SR1	7	1.000
+GTDB	p	Ca. Kazan-3B-28	5	1.000
+GTDB	p	Ca. CPR2	2	1.000
+GTDB	p	Ca. Saccharibacteria	120	0.983
+GTDB	p	Parcubacteria	661	0.982
+GTDB	p	Ca. Doudnabacteria	13	1.000
+GTDB	p	Microgenomates	221	0.973
+GTDB	p	Ca. Berkelbacteria	16	0.889
+GTDB	p	Ca. WS2	1	1.000
+GTDB	p	Ca. Dojkabacteria	25	0.962
+GTDB	p	Ca. CPR3	2	0.500
+GTDB	p	Ca. WWE3	30	0.935
+GTDB	p	Ca. Wirthbacteria	1	1.000
+GTDB	p	Acidobacteria	446	0.933
+GTDB	p	Ca. Aerophobetes	9	0.700
+GTDB	p	Elusimicrobia	106	0.920
+GTDB	p	Ca. FCPU426	4	0.571
+GTDB	p	Ca. Firestonebacteria	2	1.000
+GTDB	p	Ca. Goldbacteria	1	1.000
+GTDB	p	Ca. Desantisbacteria	4	0.800
+GTDB	p	Ca. TA06	9	0.222
+GTDB	p	Ca. NPL-UPA2	1	1.000
+GTDB	p	Ca. Poribacteria	31	1.000
+GTDB	p	Ca. Coatesbacteria	3	0.500
+GTDB	p	Ca. Raymondbacteria	1	1.000
+GTDB	p	Ca. KSB1	9	0.389
+GTDB	p	Calditrichaeota	14	0.407
+GTDB	p	Ca. Delongbacteria	3	1.000
+GTDB	p	Deferribacteres	18	0.944
+GTDB	p	Ca. Rokubacteria	35	0.971
+GTDB	p	Ca. WOR-3	26	0.656
+GTDB	p	Ca. Pyropristinus	1	1.000
+GTDB	p	Ca. Hydrothermae	3	0.333
+GTDB	p	Ca. Edwardsbacteria	1	1.000
+GTDB	p	Ca. GN15	1	1.000
+GTDB	p	Ca. Glassbacteria	1	1.000
+GTDB	p	OMG	13	0.214
+GTDB	p	Ca. Eisenbacteria	12	1.000
+GTDB	p	Ca. Aminicenantes	35	0.895
+GTDB	p	Acidobacteria_subdivision_22	1	1.000
+GTDB	p	Acidobacteria_subdivision_2	1	1.000
+GTDB	p	Acidobacteria_subdivision_13	1	1.000
+GTDB	p	Chrysiogenetes	3	0.667
+GTDB	p	Aquificae	46	0.938
+GTDB	p	Ca. NC10	12	1.000
+GTDB	p	Ca. KSB3	1	1.000
+GTDB	p	Ca. Schekmanbacteria	3	1.000
+GTDB	p	Nitrospinae/Tectomicrobia	32	0.842
+GTDB	p	Thermodesulfobacteria	30	0.867
+GTDB	p	Ca. Dadabacteria	12	0.571
+GTDB	p	Ca. UBP10	3	0.400
+GTDB	p	OM43	3	0.500
+GTDB	p	Ca. Porisulfidus	1	1.000
+GTDB	p	ATMA endosymbionts	21	0.304
+GTDB	p	sulfur-oxidizing_symbionts	15	0.240
+GTDB	p	SAR92	7	0.250
+GTDB	p	BD1-7	3	0.667
+GTDB	p	Ca. Baumannia	4	1.000
+GTDB	p	PS1	3	0.600

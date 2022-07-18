@@ -846,18 +846,29 @@ ggsave("./figures/support_16K_comp_lt_0.95.pdf",width=5, height=4)
 #####################
 
 library(dplyr)
-df <-read.table("./data/snakemake_timeline_100_10.csv", header=F)
-colnames(df) <- c("type", "rule", "time", "jobid", "cpus", "act_cpus")
+library(ggforce)
+df <-read.table("./data/snakemake_timeline_500_mc-2-07.csv", header=F)
+colnames(df) <- c("type", "rule", "time", "jobid", "cpus", "act_cpus", "method")
 dfun <- df %>% group_by(time) %>% top_n(1, act_cpus)
 #dfun <- distinct(df,time, .keep_all= TRUE)
 #dfun <- df
-ggplot(dfun, aes(x = time/60, y = act_cpus+1, group=1) ) + theme_classic()  + geom_path(color=cbPalette[4]) +
-  scale_y_continuous(trans='log2', breaks=c(1,4, 16,64, 256, 1024, 2048)) +
-  theme(text = element_text(size=12),axis.text.x = element_text(angle=45, hjust=1)) +
-  labs( x = "Time (minutes)", y = "CPU usage")
 
+ggplot(dfun, aes(x = time/60, y = act_cpus, color=method) )   + geom_path() + theme_classic() +
+  scale_y_continuous(trans='log2', breaks=c(1,4,16, 64, 256, 1024), limits = c(1,1600)) +
+  #facet_zoom(xlim = c(0, 850),zoom.size = 3)+
+  annotate("rect", xmin = 0, xmax = 344, ymin = 0, ymax = 800, alpha = .1,fill = "blue")+
+  annotate("text", x=172, y=1300, label="Backbone tree\ninference", size=2.5)+
+  annotate("rect", xmin = 344, xmax = 880, ymin = 0, ymax = 800, alpha = .1,fill = "yellow")+
+  annotate("text", x=622, y=1300, label="Backbone tree\nupdate", size=2.5)+  
+  theme(legend.position = c(0.8,0.8),
+        text = element_text(size=11),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        legend.background = element_rect(fill = alpha("white", 0.0))) + 
+  labs( x = "Wall clock time (minutes)", y = "CPU usage") +
+  scale_colour_manual(name = "", values=cbPalette[c(4,2,4,6)])
 
-ggsave("./figures/udance_timeline_500.pdf",width=3, height=3)
+ggsave("./figures/udance_timeline_500.pdf",width=7.5, height=2.5)
+
 
 ggplot(dfun, aes(x = time/60, y = act_cpus+1, group=1) ) + theme_classic()  + geom_path(color=cbPalette[4]) +
   #scale_y_continuous(trans='log2', breaks=c(1,4, 16,64, 256, 1024, 2048)) +
@@ -865,6 +876,15 @@ ggplot(dfun, aes(x = time/60, y = act_cpus+1, group=1) ) + theme_classic()  + ge
   labs( x = "Time (minutes)", y = "CPU usage")
 
 ggsave("./figures/udance_timeline_500_lin.pdf",width=3, height=3)
+
+dfc <-read.table("data/concat_timeline_data.csv", sep=",")
+colnames(dfc) <- c("type", "rule", "time", "jobid", "cpus", "act_cpus", "method")
+dfun <- rbind(dfun,dfc)
+
+ggplot(dfun, aes(x = time/60, y = act_cpus, color=method) ) + theme_classic()  + geom_path() +
+  scale_y_continuous(trans='log2', breaks=c(1,4, 16,64, 256, 1024, 2048)) +
+  theme(text = element_text(size=12),axis.text.x = element_text(angle=45, hjust=1)) +
+  labs( x = "Time (minutes)", y = "CPU usage") 
 
 #####################
 
@@ -939,50 +959,64 @@ ggplot(aes(x=tree,y=rank, fill=consistency), data=df[df$rank %in% ranks,]) +
         strip.background = element_blank(),
         strip.text.y = element_blank()) + 
   guides(fill = guide_colourbar(barwidth = 10, barheight = 0.5)) +
-  xlab("")+ylab("") +
+  xlab("")+ylab("") 
 
 ggsave("./figures/tree_comparison_consistency.pdf",width=8, height=7)
+
+
+
+df <- read.table("./data/consistency_results_fulltaxdump_clean.tsv", sep = "\t")
+colnames(df) <- c("tree", "rn", "rank", "count", "consistency")
+
+ranks = df[df$tree=="16k.uDance" & df$count >= 20,]$rank
+df$cat <- df$rn == "d"
+
+df$tree <- as.factor(df$tree)
+levels(df$tree) <- c("10k.concat", "10k.astral", "16k.uDance", "200k.uDance", "GTDB")
+#acc_sca$selection=as.factor(acc_sca$selection)
+#levels(acc_sca$selection) <- c("best","random")
 
 
 dfper <- merge(df[df$rank %in% ranks & df$tree %in% c("16k.uDance"),],
                df[df$rank %in% ranks & df$tree %in% c("10k.astral"),],
                by="rank")
 dfper$diffperr = (dfper$count.x - dfper$count.y)/dfper$count.y
-head(dfper)
+dfperacc <- dfper
+dfper <- merge(df[df$rank %in% ranks & df$tree %in% c("200k.uDance"),],
+               df[df$rank %in% ranks & df$tree %in% c("10k.astral"),],
+               by="rank")
+dfper$diffperr = (dfper$count.x - dfper$count.y)/dfper$count.y
+head(dfperacc)
+dfperacc <- rbind(dfperacc,dfper)
 
-ggplot(aes(y=reorder(rank, -diffperr), x=diffperr), data=dfper) + geom_bar(stat="identity") +
+
+ggplot(aes(fill=reorder(tree.x, diffperr), y=factor(rank, levels=levels(reorder(dfperacc$rank, dfperacc$diffperr))), x=diffperr),data=dfperacc) + 
+  geom_bar(data=dfperacc[dfperacc$tree.x=="200k.uDance",], stat="identity", position=position_dodge(width = 0), color="black",size=0.2) +
+  geom_bar(data=dfperacc[dfperacc$tree.x=="16k.uDance",], stat="identity", position=position_dodge(width = 0), color="black",size=0.2) +
   theme_classic()+
-  facet_grid(cat.y ~ ., scales = "free", space = "free_y") + xlab("Taxon sampling increase") + ylab("") +
-  theme(strip.background = element_blank(),
-                strip.text.y = element_blank() ) +
-  scale_x_continuous(labels = scales::percent)
+  facet_grid(reorder(cat.y, -count.x) ~ ., scales = "free", space = "free_y") + xlab("Taxon sampling increase") + ylab("") +
+  theme(legend.position = c(0.65,0.2), strip.background = element_blank(),
+        strip.text.y = element_blank() ) +
+  scale_x_continuous() +
+  scale_fill_grey(name="", labels=c("10k -> 16k", "10k -> 200k")) 
 
-ggsave("./figures/taxon_sampling_increase_10_to_16.pdf",width=7, height=5)
-
-
-df <- read.table("./data/consistency_results_fulltaxdump.tsv")
-colnames(df) <- c("tree", "rank", "count", "consistency")
-
-ranks = df[df$tree=="16k.uDance" & df$count >= 20,]$rank
-df$cat <- startsWith(df$rank, "d")
+ggsave("./figures/taxon_sampling_increase_10_to_16and2000.pdf",width=150/40, height=200/40)
 
 df$tree <- as.factor(df$tree)
-levels(df$tree) <- c("10k.concat", "10k.astral", "16k.uDance", "200k.uDance", "gtdb")
-#acc_sca$selection=as.factor(acc_sca$selection)
-#levels(acc_sca$selection) <- c("best","random")
+levels(df$tree) <- c("10k.concat", "10k.astral", "16k.uDance", "200k.uDance", "GTDB")
 
-ggplot(aes(x=tree,y=reorder(rank, count), fill=consistency), data=df[df$rank %in% ranks,]) +  
-  facet_grid(reorder(cat,-count) ~ ., scales = "free", space = "free_y") + geom_tile() + theme_classic()+
-  scale_fill_gradient2(low="#000000", mid="#FF0000",midpoint = .5 , high = "yellow")+
+ggplot(aes(x=tree,y=factor(rank, levels=levels(reorder(dfperacc$rank, dfperacc$diffperr))), fill=consistency), data=df[df$rank %in% ranks,]) +  
+  facet_grid(reorder(cat,-count) ~ ., scales = "free", space = "free_y") + geom_tile(color="#BBBBBB") + theme_classic()+
+  scale_fill_gradient2(name="",low="#000000", mid="#777777",midpoint = .5 , high = "#FFFFFF", breaks=c(0.25,0.5,0.75,1), labels=scales::percent)+
   theme(legend.position="top", 
         text = element_text(size=12), 
-        axis.text.x = element_text(angle=45, hjust=1),
+        axis.text.x = element_text(angle=25, hjust=1),
         strip.background = element_blank(),
         strip.text.y = element_blank()) + 
   guides(fill = guide_colourbar(barwidth = 10, barheight = 0.5)) +
   xlab("")+ylab("") 
-  
-ggsave("./figures/tree_comparison_consistency_fulltaxdump2.pdf",width=8, height=7)
+
+ggsave("./figures/tree_comparison_consistency_fulltaxdump2.pdf",width=110/25, height=225/25)
   
 ############################
 
@@ -1016,8 +1050,75 @@ for( ctypeastr in c("rand", "cons", "astral")){
 }
 
 
+df<-read.table("data/ncbi_top30_rfqd_rename.csv", header=F, sep="\t")
+colnames(df) <- c("qd", "rf", "method1", "method2", "phylum")
+
+
+order_ref <-dfperacc[dfperacc$tree.x == "200k.uDance" & dfperacc$rank %in% df$phylum,]
+ggplot(aes(fill=qd, x=method1, y=factor(phylum, levels=levels(reorder(levels(as.factor(df$phylum)), order_ref$diffperr)))), 
+           data=df[df$method1 != "200k" & df$method2 == "200k",]) + geom_tile() + theme_classic() + #facet_grid(~method2) #+ 
+  facet_grid(. ~ method2, scales = "free", space = "free_x") + geom_tile() + theme_classic()+
+  theme(legend.position="top", 
+        text = element_text(size=12), 
+        axis.text.x = element_text(angle=45, hjust=1),
+        strip.background = element_blank(),
+        strip.text.y = element_blank()) + 
+  guides(fill = guide_colourbar(barwidth = 10, barheight = 0.5)) +
+  xlab("")+ylab("") +
+scale_fill_gradient2(name= "QD   ", 
+                     low = "#075AFF",
+                     mid = "#FFFFCC",
+                     high = "#FF0000") 
+
+
+ggsave("./figures/qd_tree_compare_heat.pdf",width=5, height=6)
+
+ggplot(aes(fill=qd, x=method1, y=factor(phylum, levels=levels(reorder(levels(as.factor(df$phylum)), order_ref$diffperr)))), 
+       data=df) + geom_tile() + theme_classic() + #facet_grid(~method2) #+ 
+  facet_grid(. ~ method2, scales = "free", space = "free_x") + geom_tile() + theme_classic()+
+  theme(legend.position="top", 
+        text = element_text(size=12), 
+        axis.text.x = element_text(angle=45, hjust=1),
+        strip.background = element_blank(),
+        strip.text.y = element_blank()) + 
+  guides(fill = guide_colourbar(barwidth = 10, barheight = 0.5)) +
+  xlab("")+ylab("") +
+  scale_fill_gradient2(name= "QD   ", 
+                       low = "#075AFF",
+                       mid = "#FFFFCC",
+                       high = "#FF0000") 
+
+ggsave("./figures/qd_tree_compare_heat_all.pdf",width=10, height=6)
 #######################################
-df <-read.table("./data/ag-disag-16k-10krand.txt", header=F)
+ctypeastr="astral"
+df <-read.table(sprintf("./data/treedistcomp_sampled_%s.csv",ctypeastr), header=F)
+dim(df)
+df$type <- paste(df$V1, df$V2, sep = "-")
+head(df)
+colnames(df) <- c("o1", "o2", "16k.uDance", "10k.astral", "s1", "s2", "type")
+dfm <- melt(data=df, measure=c("16k.uDance", "10k.astral"))
+ggplot(aes(x=value, linetype=variable), data=dfm) + geom_density() + theme_classic() +
+  facet_grid(type~.) + xlab("Root-to-tip distance") + ylab("Density") + theme(legend.title = element_blank())
+ggsave(sprintf("./figures/pairwise_distance_density_%s.pdf", ctypeastr),width=8, height=7)
+
+
+df2 <- read.table(sprintf("./data/treedistcomp_sampled_%s.csv",ctypeastr), header=F)
+df2[df2$V1 != "archaea",]$V1 = "bacteria"
+df2[df2$V2 != "archaea",]$V2 = "bacteria"
+df2$type <- paste(df2$V1, df2$V2, sep = "-")
+colnames(df2) <- c("o1", "o2", "16k.uDance", "10k.astral", "s1", "s2", "type")
+dfm <- melt(data=df2, measure=c("16k.uDance", "10k.astral"))
+
+ggplot(aes(x=value, linetype=variable), data=dfm) + geom_density() + theme_classic() +
+  facet_grid(type~.) + xlab("Root-to-tip distance") + ylab("Density") + theme(legend.title = element_blank())
+
+ggsave(sprintf("./figures/pairwise_distance_density_AB_%s.pdf", ctypeastr),width=8, height=4)
+
+
+#######################################
+#df <-read.table("./data/ag-disag-16k-10krand.txt", header=F)
+df <-read.table("./data/ag-disag-16k-10kastralbl.txt", header=F)
+
 head(df)
 colnames(df) <- c("tag", "rootd", "edgelen", "V4", "tree", "agreement")
 df$rootdnorm = 0
@@ -1026,55 +1127,111 @@ for(i in c("tree1", "tree2")){
   df[df$tree==i,]$rootdnorm <-  df[df$tree==i,]$rootd / m
 }
 
+df2 <-read.table("./data/ag-disag-200k-16k.txt", header=F)
+
+head(df2)
+colnames(df2) <- c("tag", "rootd", "edgelen", "V4", "tree", "agreement")
+df2$rootdnorm = 0
+for(i in c("tree1", "tree2")){
+  m = max(df2[df2$tree==i,]$rootd)
+  df2[df2$tree==i,]$rootdnorm <-  df2[df2$tree==i,]$rootd / m
+}
+
+df$treebig="16k.uDance"
+df2$treebig="200k.uDance"
+df <- rbind(df2,df)
+
 ggplot(aes(color=tree, x=rootd, linetype=agreement),data=df) + geom_density() + theme_classic() +
-  xlab("Depth") + ylab("Density") + 
-  scale_colour_manual(name="",labels = c("16k.uDance", "10k.astral.rand"), values=cbPalette[c(1,2)]) +
+  xlab("Depth") + ylab("Density") + facet_wrap(.~treebig)+
+  scale_colour_manual(name="",labels = c("Extended", "Backbone"), values=cbPalette[c(1,2)]) +
   theme(legend.position=c(0.9,0.65)) 
 
-ggsave("./figures/root2tip_16k_10k.pdf",width=9, height=3)
+ggplot(aes(x=rootd, color=agreement),data=df[df$tree=="tree1",]) + stat_ecdf() + theme_classic() +
+  xlab("Depth") + ylab("ECDF") + facet_wrap(.~treebig)+
+  scale_y_continuous(trans="sqrt", breaks=c(0,0.01,0.04,0.09,0.16,0.25,0.36,0.49, 0.64,0.81, 1), 
+                     label=percent) +
+  scale_x_continuous(breaks = c(0,0.35,1,2,3,4))+
+  #geom_vline(xintercept = 0.25, color="red", linetype="dashed ")+
+  scale_colour_manual(name="", values=cbPalette[c(1,2)]) + coord_cartesian(xlim=c(0,3.6))+
+  theme(legend.position=c(0.9,0.25),text = element_text(size=12)) 
 
-ggplot(aes(color=tree, x=rootdnorm, linetype=agreement),data=df) + geom_density() + theme_classic() +
-  xlab("Depth") + ylab("Density") + 
-  scale_colour_manual(name="",labels = c("16k.uDance", "10k.astral.rand"), values=cbPalette[c(1,2)]) +
+ggsave("./figures/root2tip_200k_16k_10k.pdf",width=8, height=4)
+
+ggplot(aes(x=rootd, color=agreement),data=df[df$tree=="tree1" & df$treebig == "16k.uDance",]) + stat_ecdf() + theme_classic() +
+  xlab("Depth") + ylab("ECDF") + #facet_wrap(.~treebig)+
+  scale_y_continuous(trans="sqrt", breaks=c(0,0.01,0.04,0.09,0.16,0.25,0.36,0.49, 0.64,0.81, 1), 
+                     label=percent) +
+  scale_x_continuous(breaks = c(0,0.35,1,2,3,4))+
+  #geom_vline(xintercept = 0.25, color="red", linetype="dashed ")+
+  scale_colour_manual(name="", values=cbPalette[c(1,2)]) + coord_cartesian(xlim=c(0,3.6))+
+  theme(legend.position=c(0.9,0.25),text = element_text(size=10)) 
+
+ggsave("./figures/root2tip_16k_10k.pdf",width=4, height=4)
+
+ggplot(aes(x=rootdnorm, linetype=agreement),data=df[df$tree=="tree1",]) + geom_density() + theme_classic() +
+  xlab("Depth") + ylab("Density") + facet_wrap(.~treebig)+
+  scale_colour_manual(name="",labels = c("16k.uDance", "10k.astral"), values=cbPalette[c(1,2)]) +
   theme(legend.position=c(0.9,0.65)) 
 
-ggsave("./figures/root2tip_16k_10k_norm.pdf",width=9, height=3)
-
-ggplot(aes(color=tree, x=rootdnorm, linetype=agreement),data=df) + geom_density() + theme_classic() +
-  xlab("Depth") + ylab("Density") + facet_wrap(tree~., ncol=1) + 
-  scale_colour_manual(name="",labels = c("16k.uDance", "10k.astral.rand"), values=cbPalette[c(1,2)]) +
-  theme(legend.position=c(0.9,0.8), 
-        strip.background = element_blank(), 
-        strip.text.y = element_blank(),
-        strip.text.x = element_blank()) 
-
-ggsave("./figures/root2tip_16k_10k_norm_facet.pdf",width=9, height=6)
+ggsave("./figures/root2tip_200k_16k_10k_norm_density.pdf",width=9, height=3)
 
 ggplot(aes(x=tree, y=rootd, linetype=agreement),data=df) + geom_boxplot() + theme_classic() + 
   xlab("") + ylab("Depth") + 
-  scale_x_discrete(name="",labels = c("16k.uDance", "10k.astral.rand")) +
+  scale_x_discrete(name="",labels = c("16k.uDance", "10k.astral")) +
   theme(legend.position=c(0.8,0.8)) 
 
 ggsave("./figures/root2tip_16k_10k_boxplot.pdf",width=4, height=4)
 
-ggplot(aes(x=tree, y=rootdnorm, linetype=agreement),data=df) + geom_boxplot() + theme_classic() + 
+ggplot(aes(x=treebig, y=rootdnorm, linetype=agreement),data=df[df$tree=="tree1",]) + geom_boxplot() + theme_classic() + 
   xlab("") + ylab("Depth") + 
-  scale_x_discrete(name="",labels = c("16k.uDance", "10k.astral.rand")) +
+  #scale_x_discrete(name="",labels = c("16k.uDance", "10k.astral")) +
   theme(legend.position="right") 
 
-ggsave("./figures/root2tip_16k_10k_boxplot_norm.pdf",width=5, height=4)
+ggsave("./figures/root2tip_200k_16k_boxplot_norm.pdf",width=5, height=4)
 
 
-ggplot(aes(x=tree, y=edgelen, linetype=agreement, color=tree),data=df) + 
-  geom_boxplot(outlier.alpha = 0.5) + theme_classic() + 
+ggplot(aes(x=edgelen, color=agreement),data=df[df$tree=="tree1",]) + 
+  stat_ecdf() + theme_classic() + facet_wrap(.~treebig)+
+  xlab("Branch Length") + ylab("ECDF") + 
+  scale_colour_manual(name="", values=cbPalette[c(1,2)]) +
+  #scale_x_discrete(name="",labels = c("16k.uDance", "10k.astral")) +
+  theme(legend.position="right") + coord_cartesian(xlim = c(0+0.000001,1)) +
+  scale_x_continuous(trans = 'log10', breaks = c(0.000001,0.00001,0.0001,0.001,0.01,0.1,1))  + #guides(color="none") +
+  theme(legend.position=c(0.10,0.85)) 
+
+ggsave("./figures/bl_200_16k_log_ecdf.pdf",width=8, height=4)
+
+ggplot(aes(x=edgelen, color=agreement),data=df[df$tree=="tree1",]) + 
+  stat_ecdf() + theme_classic() + facet_wrap(.~treebig)+
+  xlab("Branch Length") + ylab("ECDF") + 
+  scale_colour_manual(name="", values=cbPalette[c(1,2)]) +
+  #scale_x_discrete(name="",labels = c("16k.uDance", "10k.astral")) +
+  theme(legend.position="right") + coord_cartesian(xlim = c(0+0.000001,1)) +
+  scale_x_continuous(trans = 'sqrt', breaks=c(0,0.01,0.04,0.09,0.16,0.25,0.36,0.49, 0.64,0.81, 1))  + #guides(color="none") +
+  theme(legend.position=c(0.9,0.2)) 
+
+ggsave("./figures/bl_200_16k_sqrt_ecdf.pdf",width=8, height=4)
+
+ggplot(aes(x=edgelen, color=agreement),data=df[df$tree=="tree1" & df$treebig == "16k.uDance",]) + 
+  stat_ecdf() + theme_classic() + #facet_wrap(.~treebig)+
+  xlab("Branch Length") + ylab("ECDF") + 
+  scale_colour_manual(name="", values=cbPalette[c(1,2)]) +
+  #scale_x_discrete(name="",labels = c("16k.uDance", "10k.astral")) +
+  theme(legend.position="right") + coord_cartesian(xlim = c(0+0.000001,1)) +
+  scale_x_continuous(trans = 'sqrt', breaks=c(0,0.01,0.04,0.09,0.16,0.25,0.36,0.49, 0.64,0.81, 1))  + #guides(color="none") +
+  theme(legend.position=c(0.9,0.2), text = element_text(size=10)) 
+
+ggsave("./figures/bl_16k_sqrt_ecdf.pdf",width=4, height=4)
+
+
+ggplot(aes(x=edgelen, linetype=tree, color=agreement),data=df) + 
+  geom_density() + theme_classic() + 
   xlab("") + ylab("Branch Length") + 
-  scale_colour_manual(name="",labels = c("16k.uDance", "10k.astral.rand"), values=cbPalette[c(1,2)]) +
-  scale_x_discrete(name="",labels = c("16k.uDance", "10k.astral.rand")) +
-  theme(legend.position="right") + coord_cartesian(ylim = c(0,0.9)) +
-  scale_y_continuous(trans = 'sqrt', breaks = seq(0,0.9,0.1))  + guides(color="none") +
-  theme(legend.position=c(0.85,0.85)) 
-
-ggsave("./figures/bl_16k_10k_boxplot.pdf",width=5, height=5)
+  scale_colour_manual(name="",labels = c("16k.uDance", "10k.astral"), values=cbPalette[c(1,2)]) +
+  #scale_x_discrete(name="",labels = c("16k.uDance", "10k.astral")) +
+  theme(legend.position="right") + #coord_cartesian(ylim = c(0,0.9)) +
+  scale_x_continuous(trans = 'sqrt', breaks = seq(0,0.9,0.1))  + #guides(color="none") +
+  theme(legend.position=c(0.65,0.65)) 
 
 ##########################
 
@@ -1092,6 +1249,17 @@ ggsave("./figures/bl_16k_10k_boxplot.pdf",width=5, height=5)
 #         axis.text.x=element_blank(),
 #         axis.ticks.x=element_blank()) 
 
+######################
+df <-read.table("./data/gene_tree_discordance_16k.csv", header=F)
+head(df)
+colnames(df) <- c("quartet", "rf", "partition", "gene")
+
+ggplot(aes(x=reorder(gene, quartet) , y=reorder(partition,quartet), fill=quartet), data=df) + geom_tile() +
+  theme_classic() + 
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  scale_fill_gradient2(low="yellow", mid="#FF0000",midpoint = .5 , high = "#000000")
 
 ##################
 library(stringr)
@@ -1131,7 +1299,7 @@ mgddf = mgddf[mgddf$go!="GO:0003674",]
 ggplot(aes(y=1-quartet, x=reorder(str_wrap(goname, width=10),quartet,na.rm = TRUE) , color=goname), data=mgddf[mgddf$goname != "other",]) + 
   geom_boxplot() + theme_classic() + geom_jitter(width = 0.1)  +
   #scale_x_discrete(labels = wrap_format(10)) +
-  ylab("Quartet distance") + xlab("Molecular function") +
+  ylab("Quartet similarity") + xlab("Molecular function") +
   scale_color_brewer(palette = "Paired") +
   guides(colour = FALSE)
 
@@ -1144,6 +1312,7 @@ ggsave("./figures/gene_tree_discordance_16k.pdf",width=8, height=5)
 
 dfall <- read.delim("data/stee_partition_all.csv",fill = T,na.strings = "", header=F)
 head(dfall)
+
 
 for (sz in c("500", "100")){
   for(i in c("QD", "nRF")){
@@ -1213,8 +1382,6 @@ for (sz in c("500", "100")){
     ggsave(sprintf("./figures/violin_stee_partition_%s_%s.pdf", i,sz),width=8, height=4)
   }
 }
-i="nRF"
-sz="100"
 
 ggplot(dfm[dfm$size == sz & dfm$mc != "mc3-500",], aes(x = variable, y = value, fill=variable)) + 
   facet_grid(.~mc) +
@@ -1234,7 +1401,11 @@ ggsave(sprintf("./figures/violin_stee_partition_%s_%s_no500.pdf", i,sz),width=8,
 dfall <- read.delim("data/stee_full_all.csv",fill = T,na.strings = "", header=F)
 head(dfall)
 
-for (sz in c("500", "100")){
+i="QD"
+sz="100"
+
+#for (sz in c("500", "100")){
+for (sz in c("100")){
   for(i in c("QD", "nRF")){
     if (i == "QD") {
       colnames(dfall) <- c("rep", "size", "uDance", "uDancer", 
@@ -1283,7 +1454,8 @@ for (sz in c("500", "100")){
       geom_text(data=z,aes(y=0.000001, x=variable, label=con))+
       geom_point(aes(color=variable)) + #facet_wrap(.~size)+
       #geom_errorbar(aes(xmin = value - std.err, xmax = estimate + std.error), width = 0.3)+
-      stat_summary( geom = "errorbar", fun.min = mean, fun = mean, fun.max = mean, width = .75)+
+      stat_summary( geom = "errorbar", fun.min = median, fun = median, fun.max = median, width = .75)+
+      stat_summary( geom = "errorbar", width = .25, size=0.3)+
       theme_classic() +
       scale_y_continuous(trans="log", breaks = c(0.000001, 0.0000001, 0.000001,0.00001, 0.0001, 0.001, 0.01, 0.1, 1 ))+
       theme(text = element_text(size=10), axis.text.x = element_text(angle=45, hjust=1)) +
@@ -1297,12 +1469,13 @@ for (sz in c("500", "100")){
       geom_text(data=z,aes(y=0.01, x=variable, label=con))+
       geom_point(aes(color=variable)) + #facet_wrap(.~size)+
       stat_summary( geom = "errorbar", fun.min = mean, fun = mean, fun.max = mean, width = .75)+ 
+      stat_summary( geom = "errorbar", width = .25, size=0.3)+
       theme_classic() +
-      #scale_y_continuous(trans="log", breaks = c(0.01, 0.1, 0.8))+
+      scale_y_continuous(trans="sqrt") + #, breaks = c(0.01, 0.1, 0.8))+
       theme(text = element_text(size=10), axis.text.x = element_text(angle=45, hjust=1)) +
       scale_color_manual(values = cbPalette[c(2,3,4)]) + xlab("")+ylab(sprintf("Species Tree Estimation Error (%s)", i)) +
       #coord_cartesian(ylim=c(0.01, 0.8)) + 
-      guides(color=F)
+      guides(color=F) #+ coord_cartesian(ylim = c(0,0.3))
   }
   
   
@@ -1311,7 +1484,7 @@ for (sz in c("500", "100")){
 }
 
 sz=100
-i=nRF
+i="nRF"
 
 ggplot(dfm[dfm$size == sz & dfm$mc != "mc3-500",], aes(x = variable, y = value)) + 
   facet_grid(.~mc) +
@@ -1345,8 +1518,8 @@ levels(dfm$mc) = c("mc3-100", "mc3-200", "mc3-300", "mc3-400", "mc3-500", "mc1",
 dfm$mc = factor(dfm$mc,  levels=c("mc1", "mc2", "mc3-100", "mc3-200", "mc3-300", "mc3-400", "mc3-500"))
 
 
-sz=500
-i=nRF
+sz=100
+i="nRF"
 ggplot(dfm[dfm$size == sz,], aes(x = variable, y = value, fill=variable)) + 
   facet_grid(.~mc) +
   #geom_text(data=z,aes(y=0.01, x=variable, label=con))+
@@ -1359,7 +1532,7 @@ ggplot(dfm[dfm$size == sz,], aes(x = variable, y = value, fill=variable)) +
   guides(fill=F)
 
 
-ggsave("./figures/violin_gene_discordance_nRF_100.pdf",width=8, height=4)
+ggsave(sprintf("./figures/violin_gene_discordance_%s_%s.pdf", i,sz),width=8, height=4)
 
 dfd <- dfall[,c("mc", "rep", "cluster", "gene", "size", "uDance-GTEE", "FastTree2-GTEE")]
 colnames(dfd) <- c("mc", "rep", "cluster", "gene", "size", "uDance", "FastTree2")
@@ -1392,16 +1565,19 @@ ggplot(dfd[dfd$size == sz, ], aes(x = variable, y = value, fill=variable)) +
 #   stat_summary()+theme_classic() +
 #   scale_fill_manual(values = cbPalette[c(3,4)]) + xlab("Gene Tree Estimation Error")+ylab("nRF")
 
-ggsave("./figures/violin_gene_delta_nRF_100.pdf",width=8, height=4)
+ggsave("./figures/violin_gene_delta_nRF_500.pdf",width=3, height=4)
 
-######################################
 
-df <-read.table("data/runtime_100_all.csv", sep=',')
+
+################################################
+df <-read.table("data/runtime_100_500_all.csv", sep=',')
 
 colnames(df) <-c("Task", "cores", "time", "tottime", "size", "rep", "method")
-goodreps <-df[df$method == "FT2+ASTRAL" & !is.na(df$time) & df$Task == "ASTRAL",]$rep
+goodreps <-df[df$method == "FT2+ASTRAL" & !is.na(df$time) & df$Task == "ASTRAL" & df$size == 100,]$rep
+goodreps2 <-df[df$method == "concat" & !is.na(df$time) & df$Task == "FastTree-2" & df$size == 500,]$rep
+goodreps <- goodreps[goodreps %in% goodreps2]
 
-dfs <- df[df$rep %in% goodreps & df$size == 100,]
+dfs <- df[df$rep %in% goodreps ,]
 
 dfs$Task = as.factor(dfs$Task)
 levels(dfs$Task) = c("APPLES-2", "ASTRAL", "ASTRAL", "ASTRAL", "FastTree-2", "IQTree", "IQTree", "RAxML-ng", "RAxML-ng" )
@@ -1411,13 +1587,100 @@ dfs$method = as.factor(dfs$method)
 dfs$method = factor(dfs$method, levels=c("uDance", "FT2+ASTRAL", "concat"))
 
 
+
 ggplot(aes(x=reorder(as.factor(rep),tottime), y=tottime, fill=Task), data=dfs) + geom_bar(position="stack", stat="identity") +
-  facet_wrap(.~method) + theme_classic() + scale_fill_brewer(palette="Set2") +
+  facet_wrap(size~method) + theme_classic() + scale_fill_brewer(palette="Set2") +
+  geom_text(data=dfs[dfs$method == "FT2+ASTRAL" & dfs$size == 500 ,],aes(y=10^6, x=as.factor(rep), label="X"), color="orange")+
   ylab("Time (CPU seconds)") + xlab("Replicate ID") + #theme(axis.text.x = element_blank()) +
   #scale_y_continuous(breaks = c(1000000, 2000000, 3000000, 4000000, 5000000, 6000000))
   scale_y_continuous(labels = label_number(scale_cut = cut_short_scale()), 
                     breaks = c(1000000, 2000000, 3000000, 4000000, 5000000, 6000000))
 
-ggsave("./figures/hgt_runtime_100.pdf",width=5, height=4)
+ggsave("./figures/hgt_runtime_100.pdf",width=6, height=6)
 
-  
+dfm <- read.table("./data/hgt_memory.csv", header=F)
+colnames(dfm) <- c("method", "rep", "size", "memory")
+
+ggplot(aes(x=method, y=tottime/3), data=dfs) + geom_bar(aes(fill=Task), position="stack", stat="identity") +
+   theme_classic() + scale_fill_brewer(palette="Set2") + 
+  geom_point(aes(y=memory/20000),data=dfm, alpha=0.5)+ 
+  stat_summary(aes(y=memory/20000), data = dfm, geom = "errorbar", fun.min = mean, fun = mean, fun.max = mean, width = .75)+
+  #stat_summary(aes(y=memory*5*10^4), data = dfm, geom = "errorbar", width = .25, size=0.3)+
+  facet_wrap(.~size)+
+  geom_text(data=dfs[dfs$method == "FT2+ASTRAL" & dfs$size == 500 ,],aes(y=7*10^5, x=method, label="Fail"), color="orange")+
+  ylab("Cumulative time (CPU seconds)") + xlab("") + theme(legend.position = "left", axis.text.x = element_text(angle=45, hjust=1)) +
+  #scale_y_continuous(breaks = c(1000000, 2000000, 3000000, 4000000, 5000000, 6000000))
+  scale_y_continuous(labels = label_number(scale_cut = cut_short_scale()), 
+                     breaks = c(1000000, 2000000, 3000000, 4000000, 5000000, 6000000),
+                     sec.axis = sec_axis(~.*20000, name="Peak memory", labels = scales::label_bytes()))
+
+
+ggsave("./figures/hgt_runtime_100_norep.pdf",width=5, height=4)
+
+
+df<-read.table("/Users/metin/Workspace/btol/wol2_cpureport.txt", sep=",")
+
+colnames(df) <-c("tree", "Task", "cores", "time", "tottime")
+head(df)
+dfs <- df
+dfs$Task = as.factor(dfs$Task)
+levels(dfs$Task) = c("APPLES-2", "ASTRAL", "IQTree", "RAxML-ng")
+
+my_colors <- RColorBrewer::brewer.pal(5, "Set2")[c(1,2,4,5)]
+
+
+ggplot(aes(x=tree, y=tottime/60/60), data=dfs) + geom_bar(aes(fill=Task), position="stack", stat="identity") +
+  theme_classic() + scale_fill_manual(values = my_colors) + 
+  #stat_summary(aes(y=memory*5*10^4), data = dfm, geom = "errorbar", width = .25, size=0.3)+
+  ylab("Cumulative time (CPU hours)") + xlab("") + theme(legend.position = "left", axis.text.x = element_text(angle=25, hjust=1)) +
+  #scale_y_continuous(breaks = c(1000000, 2000000, 3000000, 4000000, 5000000, 6000000))
+  scale_y_continuous(labels = label_number(scale_cut = cut_short_scale()))#, 
+
+ggsave("./figures/wol2_runtime.pdf",width=3.5, height=5)
+
+
+############################################
+
+df <- read.table("quartet_scores_root2tip_16k.csv", header=F)
+colnames(df) <- c("qs", "r2t", "qs2", "bl"  )
+
+#ggplot(data=df, aes(x=r2t, y=qs)) + geom_point(alpha=0.2) + geom_smooth(method = "loess", color="red") + theme_classic()
+
+qnt= quantile(df$r2t,c(0:30)/30)
+qnt = as.vector(qnt)
+qnt[0] = 0
+qnt_fixed = qnt 
+ggplot(aes(x=cut(r2t,qnt_fixed, include.lowest = T), y = qs),data=df) + 
+  theme_classic() + labs( y = "Quartet Score", x = "Depth") + 
+  geom_hline(yintercept = 100/3, linetype="dotted")+
+  #geom_vline(aes( xintercept=., color=method,linetype=datatype) , alpha=0.5,
+  #           data = dcast(method+datatype+size~.,data=acc_sca[acc_sca$numcopy >= 20,],value.var = "error",fun.aggregate = mean))+
+  #stat_summary(aes(y=qs),orientation = "x")+
+  #geom_vline(aes(xintercept=mean(error),color=method,linetype=datatype), alpha=0.3 , size=0.5) +
+  #geom_boxplot(aes(group=numcopy.x), outlier.alpha=0.5, outlier.size = 0.75) + 
+  stat_smooth(se=F, color="red") + #facet_wrap(.~datatype, scales = "free") +
+  stat_summary(alpha=0.8,  size=0.3, fun.min = function(x) quantile(x,0.05),fun.max = function(x) quantile(x,0.95),fun =  function(x) mean(x))+
+theme(legend.position="bottom",text = element_text(size=12),axis.text.x = element_text(angle=90, hjust=1)) 
+
+
+ggsave("./figures/depth_vs_qs_16k.pdf",width=5, height=5.5)
+
+
+qnt= quantile(df$bl,c(0:30)/30)
+qnt = as.vector(qnt)
+qnt[1] = 0
+qnt_fixed = qnt 
+ggplot(aes(x=cut(bl,qnt_fixed, include.lowest = T), y = qs),data=df) + 
+  theme_classic() + labs( y = "Quartet Score", x = "Branch length") + 
+  geom_hline(yintercept = 100/3, linetype="dotted")+
+  #geom_vline(aes( xintercept=., color=method,linetype=datatype) , alpha=0.5,
+  #           data = dcast(method+datatype+size~.,data=acc_sca[acc_sca$numcopy >= 20,],value.var = "error",fun.aggregate = mean))+
+  #stat_summary(aes(y=qs),orientation = "x")+
+  #geom_vline(aes(xintercept=mean(error),color=method,linetype=datatype), alpha=0.3 , size=0.5) +
+  #geom_boxplot(aes(group=numcopy.x), outlier.alpha=0.5, outlier.size = 0.75) + 
+  stat_smooth(se=F, color="red") + #facet_wrap(.~datatype, scales = "free") +
+  stat_summary(alpha=0.8,  size=0.3, fun.min = function(x) quantile(x,0.05),fun.max = function(x) quantile(x,0.95),fun =  function(x) mean(x))+
+  theme(legend.position="bottom",text = element_text(size=12),axis.text.x = element_text(angle=90, hjust=1)) 
+
+ggsave("./figures/bl_vs_qs_16k.pdf",width=5, height=5.5)
+
