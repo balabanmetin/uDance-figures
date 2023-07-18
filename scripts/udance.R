@@ -27,6 +27,8 @@ ggsave("./figures/cdf-nuc.pdf",width=4, height=4)
 
 
 
+
+
 df <- read.table("data/results_rax_bme.csv", sep="\t", header=F)
 for( i in 1:5){
   df[,i] <- df[,i] - df[,6]
@@ -657,10 +659,12 @@ ggplot() + geom_density(data=df3,aes(2*V2, color=V4, linetype=as.factor(V3))) + 
 
 ggsave("./figures/taxon_subsampling_density.pdf",width=7, height=5)
 
-ggplot() + stat_ecdf(data=df3,aes(2*V2, color=V4, linetype=as.factor(V3))) + #geom_density(data=df, color="blue",aes(V1,linetype=V2)) +
-  theme_classic() +scale_x_log10() + geom_vline(xintercept = 1) #+ coord_cartesian(ylim=c(0,1.5*10^-7))
+ggplot() + stat_ecdf(data=df3[df3$V4 != "max_clade",],aes(2*V2, color=V4, linetype=as.factor(V3))) + #geom_density(data=df, color="blue",aes(V1,linetype=V2)) +
+  theme_classic() +scale_x_continuous(trans="log10", name="Novelty") + geom_vline(xintercept = 1) +#+ coord_cartesian(ylim=c(0,1.5*10^-7))
+scale_linetype_manual(name="Backbone Size", values = c(1,3)) + scale_color_discrete(name="Selection Strategy") + 
+  ylab("ECDF")
 
-ggsave("./figures/taxon_subsampling_ecdf.pdf",width=7, height=5)
+ggsave("./figures/taxon_subsampling_ecdf.pdf",width=6, height=5)
 
 ###############################
 
@@ -1071,7 +1075,7 @@ scale_fill_gradient2(name= "QD   ",
                      high = "#FF0000") 
 
 
-ggsave("./figures/qd_tree_compare_heat.pdf",width=5, height=6)
+ggsave("./figures/qd_tree_compare_heat.pdf",width=4, height=6)
 
 ggplot(aes(fill=qd, x=method1, y=factor(phylum, levels=levels(reorder(levels(as.factor(df$phylum)), order_ref$diffperr)))), 
        data=df) + geom_tile() + theme_classic() + #facet_grid(~method2) #+ 
@@ -1164,9 +1168,9 @@ ggplot(aes(x=rootd, color=agreement),data=df[df$tree=="tree1" & df$treebig == "1
   scale_x_continuous(breaks = c(0,0.35,1,2,3,4))+
   #geom_vline(xintercept = 0.25, color="red", linetype="dashed ")+
   scale_colour_manual(name="", values=cbPalette[c(1,2)]) + coord_cartesian(xlim=c(0,3.6))+
-  theme(legend.position=c(0.9,0.25),text = element_text(size=10)) 
+  theme(legend.position=c(0.8,0.25),text = element_text(size=10)) 
 
-ggsave("./figures/root2tip_16k_10k.pdf",width=4, height=4)
+ggsave("./figures/root2tip_16k_10k_n.pdf",width=3.5, height=3.5)
 
 ggplot(aes(x=rootdnorm, linetype=agreement),data=df[df$tree=="tree1",]) + geom_density() + theme_classic() +
   xlab("Depth") + ylab("Density") + facet_wrap(.~treebig)+
@@ -1219,9 +1223,9 @@ ggplot(aes(x=edgelen, color=agreement),data=df[df$tree=="tree1" & df$treebig == 
   #scale_x_discrete(name="",labels = c("16k.uDance", "10k.astral")) +
   theme(legend.position="right") + coord_cartesian(xlim = c(0+0.000001,1)) +
   scale_x_continuous(trans = 'sqrt', breaks=c(0,0.01,0.04,0.09,0.16,0.25,0.36,0.49, 0.64,0.81, 1))  + #guides(color="none") +
-  theme(legend.position=c(0.9,0.2), text = element_text(size=10)) 
+  theme(legend.position=c(0.8,0.2), text = element_text(size=10)) 
 
-ggsave("./figures/bl_16k_sqrt_ecdf.pdf",width=4, height=4)
+ggsave("./figures/bl_16k_sqrt_ecdf_n.pdf",width=3.5, height=3.5)
 
 
 ggplot(aes(x=edgelen, linetype=tree, color=agreement),data=df) + 
@@ -1254,7 +1258,20 @@ df <-read.table("./data/gene_tree_discordance_16k.csv", header=F)
 head(df)
 colnames(df) <- c("quartet", "rf", "partition", "gene")
 
-ggplot(aes(x=reorder(gene, quartet) , y=reorder(partition,quartet), fill=quartet), data=df) + geom_tile() +
+ggplot(aes(x=reorder(gene, quartet) , y=as.factor(partition), fill=quartet), data=df[df$partition != 12, ]) + geom_tile() +
+  theme_classic() + 
+  theme(legend.position="top",
+        axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.x=element_blank()) +
+  scale_fill_gradient2(name = 'QD    ',low="#FFFFCC", mid="#FF0000",midpoint = .5 , high = "#000000")+
+  guides(fill = guide_colourbar(barwidth = 10, barheight = 0.5 )) +ylab("")
+
+ggsave("./figures/qdheatmap_16k.pdf",width=12, height=4)
+  
+
+ggplot(aes(x=reorder(gene, rf) , y=reorder(partition,rf), fill=rf), data=df) + geom_tile() +
   theme_classic() + 
   theme(axis.title.x=element_blank(),
         axis.text.x=element_blank(),
@@ -1270,6 +1287,8 @@ df$gene = as.factor(df$gene)
 aggdf = aggregate(df, by=list(df$gene), FUN=mean)
 x = aggdf[order(aggdf$quartet),]
 #x=df[df$gene=="p0309",]
+
+
 
 #df$gene <- factor(df$gene, levels=x$Group.1)
 
@@ -1292,18 +1311,27 @@ mgd <- merge(g2f,mf, by="go", all.x = T)
 dim(mgd)
 aggdf$gene = aggdf$Group.1
 mgddf <- merge(mgd,aggdf,by="gene", all.x=T)
+mgddf2 <- mgddf
 
 mgddf$goname[ mgddf$goname %in% names(which(table(mgddf$goname) < 20)) ] = "other"
+mgddf2$go="ALL"
+mgddf2$goname="All"
+unique(mgddf2)
+mgddf3=rbind(unique(mgddf2),mgddf)
 
-mgddf = mgddf[mgddf$go!="GO:0003674",]
-ggplot(aes(y=1-quartet, x=reorder(str_wrap(goname, width=10),quartet,na.rm = TRUE) , color=goname), data=mgddf[mgddf$goname != "other",]) + 
+mgddf3 = mgddf3[mgddf3$go!="GO:0003674",]
+require(RColorBrewer)
+xpal=brewer.pal(12, "Set3")
+xpal[2]=xpal[12] # replace light yellow with normal yellow
+
+ggplot(aes(y=1-quartet, x=reorder(str_wrap(goname, width=10),quartet,na.rm = TRUE) , color=goname), data=mgddf3[mgddf3$goname != "other",]) + 
   geom_boxplot() + theme_classic() + geom_jitter(width = 0.1)  +
   #scale_x_discrete(labels = wrap_format(10)) +
   ylab("Quartet similarity") + xlab("Molecular function") +
-  scale_color_brewer(palette = "Paired") +
+  scale_color_manual(values = xpal)+
   guides(colour = FALSE)
 
-ggsave("./figures/gene_tree_discordance_16k.pdf",width=8, height=5)
+ggsave("./figures/gene_tree_discordance_16k_all.pdf",width=8, height=5)
 
 
 
@@ -1401,104 +1429,95 @@ ggsave(sprintf("./figures/violin_stee_partition_%s_%s_no500.pdf", i,sz),width=8,
 dfall <- read.delim("data/stee_full_all.csv",fill = T,na.strings = "", header=F)
 head(dfall)
 
-i="QD"
-sz="100"
+colnames(dfall) <- c("rep", "size", "uDance-QD", "uDance-nRF", 
+                     "FastTree2-QD", "FastTree2-nRF",
+                     "ASTRID-QD", "ASTRID-nRF", "concat-QD", "concat-nRF","mc")
+dfall$mc=paste(dfall$mc, dfall$size,sep="-")
 
-#for (sz in c("500", "100")){
-for (sz in c("100")){
-  for(i in c("QD", "nRF")){
-    if (i == "QD") {
-      colnames(dfall) <- c("rep", "size", "uDance", "uDancer", 
-                           "FastTree2", "FastTree2r", "concat", "concatr","mc")
-      dfrf <- dfall[,c(1,2,3,5,7,9)]
-    } 
-    else {
-      colnames(dfall) <- c("rep",  "size", "uDanceq", "uDance", 
-                           "FastTreeq", "FastTree2", "concatq", "concat","mc")
-      dfrf <- dfall[,c(1,2,4,6,8,9)]
-    }
+dfd <- melt(data=dfall, id=c("mc", "rep", "size"))
+head(dfd)
 
-# colnames(dfall) <- c("rep", "size", "uDance", "uDancer", 
-#                      "FastTree2", "FastTree2r", "concat", "concatr","mc")
-# dfrf <- dfall[,c(1,2,3,5,7,9)]
-  dfm <- melt(data=dfrf, id=c("mc","rep", "size"))
-  dfm$variable=as.factor(dfm$variable)
-  levels(dfm$variable) = c( "uDance", "FT2-Astral", "concat")
-  dfm$variable = factor(dfm$variable, levels=c( "uDance", "FT2-Astral", "concat"))
-  #levels(dfm$variable) = c( "uDance", "FastTree2", "concat")
-  dfm$mc = as.factor(dfm$mc)
-  levels(dfm$mc) = c("mc3-100", "mc3-200", "mc3-300", "mc3-400", "mc3-500", "mc1", "mc2")
-  dfm$mc = factor(dfm$mc,  levels=c("mc1", "mc2", "mc3-100", "mc3-200", "mc3-300", "mc3-400", "mc3-500"))
-  
-  x=dfm[dfm$size == sz & !is.na(dfm$value),]
-  aggregate(x$variable, by=list(x$rep,x$mc,x$variable), FUN=length)
-  y=aggregate(x$variable, by=list(x$rep,x$mc,x$variable), FUN=length)
-  colnames(y) <-c("replicate", "mc", "method", "nvm")
-  z=aggregate(y$replicate, by=list(y$mc, y$method), FUN=length)
-  z$con = z$x
-  colnames(z) <- c("mc", "variable", "x", "con")
-  
-  x=dfm[dfm$size == sz & is.na(dfm$value),]
-  aggregate(x$variable, by=list(x$rep,x$mc,x$variable), FUN=length)
-  y=aggregate(x$variable, by=list(x$rep,x$mc,x$variable), FUN=length)
-  colnames(y) <-c("replicate", "mc", "method", "nvm")
-  z2=aggregate(y$replicate, by=list(y$mc, y$method), FUN=length)
-  z2$con = 10-z2$x
-  colnames(z2) <- c("mc", "variable", "x", "con")
-  z=rbind(z,z2)
-  head(z)
-  
-  if(i == "QD"){
-    ggplot(dfm[dfm$size == sz,], aes(x = variable, y = value)) + 
-      facet_grid(.~mc) +
-      geom_text(data=z,aes(y=0.000001, x=variable, label=con))+
-      geom_point(aes(color=variable)) + #facet_wrap(.~size)+
-      #geom_errorbar(aes(xmin = value - std.err, xmax = estimate + std.error), width = 0.3)+
-      stat_summary( geom = "errorbar", fun.min = median, fun = median, fun.max = median, width = .75)+
-      stat_summary( geom = "errorbar", width = .25, size=0.3)+
-      theme_classic() +
-      scale_y_continuous(trans="log", breaks = c(0.000001, 0.0000001, 0.000001,0.00001, 0.0001, 0.001, 0.01, 0.1, 1 ))+
-      theme(text = element_text(size=10), axis.text.x = element_text(angle=45, hjust=1)) +
-      scale_color_manual(values = cbPalette[c(2,3,4)]) + xlab("")+ylab(sprintf("Species Tree Estimation Error (%s)", i)) +
-      #coord_cartesian(ylim=c(0.000001, 1)) + 
-      guides(color=F)
-  }
-  else {
-    ggplot(dfm[dfm$size == sz,], aes(x = variable, y = value)) + 
-      facet_grid(.~mc) +
-      geom_text(data=z,aes(y=0.01, x=variable, label=con))+
-      geom_point(aes(color=variable)) + #facet_wrap(.~size)+
-      stat_summary( geom = "errorbar", fun.min = mean, fun = mean, fun.max = mean, width = .75)+ 
-      stat_summary( geom = "errorbar", width = .25, size=0.3)+
-      theme_classic() +
-      scale_y_continuous(trans="sqrt") + #, breaks = c(0.01, 0.1, 0.8))+
-      theme(text = element_text(size=10), axis.text.x = element_text(angle=45, hjust=1)) +
-      scale_color_manual(values = cbPalette[c(2,3,4)]) + xlab("")+ylab(sprintf("Species Tree Estimation Error (%s)", i)) +
-      #coord_cartesian(ylim=c(0.01, 0.8)) + 
-      guides(color=F) #+ coord_cartesian(ylim = c(0,0.3))
-  }
-  
-  
-    ggsave(sprintf("./figures/violin_stee_full_%s_%s.pdf", i,sz),width=8, height=4)
-  }
-}
+library(dplyr)
+library(tidyr)
 
-sz=100
-i="nRF"
+dfd = dfd %>% separate(variable, c("method", "measure"), "-") 
 
-ggplot(dfm[dfm$size == sz & dfm$mc != "mc3-500",], aes(x = variable, y = value)) + 
-  facet_grid(.~mc) +
-  geom_text(data=z[z$mc != "mc3-500",],aes(y=0.01, x=variable, label=con))+
-  geom_point(aes(color=variable)) + #facet_wrap(.~size)+
-  stat_summary( geom = "errorbar", fun.min = mean, fun = mean, fun.max = mean, width = .75)+ 
+head(dfd)
+colnames(dfd) <- c("mc", "rep", "size", "method","measure", "error")
+
+
+dfd$mc = as.factor(dfd$mc)
+levels(dfd$mc) = c("HD-P1", "HD-P2", "HD-P3", "HD-P4", "HD-P5", "LD-100", "MD-100", "MD-500", "HD-100", "HD-500")
+dfd$mc = factor(dfd$mc, levels= c("LD-100", "MD-100", "MD-500", "HD-100", "HD-500","HD-P1", "HD-P2", "HD-P3", "HD-P4", "HD-P5"))
+
+dfd$method = as.factor(dfd$method)
+levels(dfd$method) = c("D", "C", "A","u" )
+dfd$method = factor(dfd$method, levels=c("u","A","D","C"))
+
+dfd = dfd[!(dfd$mc == "LD-100" & dfd$method=="A"),]
+
+x=dfd
+x$na=!is.na(x$error)
+z = aggregate(x$na, by=list(x$mc,x$method, x$measure), FUN=sum)
+colnames(z) <- c("mc", "method", "measure", "con")
+z$con = 10-z$con
+z[z$mc == "LD-100",]$con = z[z$mc == "LD-100",]$con-2
+
+
+
+ggplot(dfd[dfd$measure == "nRF",], aes(x = method, y = error)) + 
+  facet_grid(.~mc,scales = "free_x") +
+  geom_text(data=z[z$measure == "nRF",],aes(y=0.000001, x=method, label=con, group=method),position = position_dodge(width = 0.7),size=3)+
+  geom_point(alpha=0.6,aes(color=method), position = position_dodge(width = 0.7), size=0.75) + #facet_wrap(.~size)+
+  #geom_errorbar(aes(xmin = value - std.err, xmax = estimate + std.error), width = 0.3)+
+  stat_summary( aes(group=method), position = position_dodge(width = 0.7), geom = "errorbar", fun.min = mean, fun = mean, fun.max = mean, width = .5)+
+  stat_summary( aes(group=method), position = position_dodge(width = 0.7), geom = "errorbar", width = .35, size=0.5)+
   theme_classic() +
-  #scale_y_continuous(trans="log", breaks = c(0.01, 0.1, 0.8))+
-  theme(text = element_text(size=10), axis.text.x = element_text(angle=45, hjust=1)) +
-  scale_color_manual(values = cbPalette[c(2,3,4)]) + xlab("")+ylab(sprintf("Species Tree Estimation Error (%s)", i)) +
-  #coord_cartesian(ylim=c(0.01, 0.8)) + 
-  guides(color=F)
+  coord_cartesian(ylim = c(0,0.25))+
+  #scale_y_continuous(trans="log", breaks = c(0.000001, 0.0000001, 0.000001,0.00001, 0.0001, 0.001, 0.01, 0.1, 1 ))+
+  #theme(legend.position = c(0.85,0.3), text = element_text(size=11), )+#axis.text.x = element_text(angle=45, hjust=1)) +
+  scale_color_manual(labels = c("uDance (u)", "FT2+ASTRAL (A)", "FT2+ASTRID (D)", "Concat (C)"), name="", values = cbPalette[c(2,3,7,4)]) + xlab("")+ylab("Species Tree Estimation Error (nRF)") +
+  #coord_cartesian(ylim=c(0.000001, 1)) #+ 
+  guides(color=guide_legend(nrow = 2),) +
+  theme(legend.position = c(0.2,0.85),legend.background = element_blank(),
+        legend.box.background = element_rect(colour = "black"),
+        legend.title = element_blank(),
+        text = element_text(size=11),
+        panel.border = element_rect(fill="NA"),
+        panel.spacing = unit(1.5,"pt"))
 
-ggsave(sprintf("./figures/violin_stee_full_%s_%s_no500.pdf", i,sz),width=8, height=4)
+ggsave("./figures/violin_stee_full_all_nRF.pdf",width=9, height=3.5)
+
+ggplot(dfd[dfd$measure == "QD",], aes(x = method, y = error)) + 
+  facet_grid(.~mc,scales = "free_x") +
+  geom_text(data=z[z$measure == "QD",],aes(y=0.000001, x=method, label=con, group=method),position = position_dodge(width = 0.7),size=3)+
+  geom_point(alpha=0.6,aes(color=method), position = position_dodge(width = 0.7), size=0.75) + #facet_wrap(.~size)+
+  #geom_errorbar(aes(xmin = value - std.err, xmax = estimate + std.error), width = 0.3)+
+  stat_summary( aes(group=method), position = position_dodge(width = 0.7), geom = "errorbar", fun.min = mean, fun = mean, fun.max = mean, width = .5)+
+  stat_summary( aes(group=method), position = position_dodge(width = 0.7), geom = "errorbar", width = .35, size=0.5)+
+  theme_classic() +
+  #coord_cartesian(ylim = c(0,0.25))+
+  scale_y_continuous(trans="log", breaks = c(0.000001, 0.0000001, 0.000001,0.00001, 0.0001, 0.001, 0.01, 0.1, 1 ))+
+  #theme(legend.position = c(0.85,0.5)  )+#axis.text.x = element_text(angle=45, hjust=1)) +
+  scale_color_manual(labels = c("uDance (u)", "FT2+ASTRAL (A)", "FT2+ASTRID (D)", "Concat (C)"), name="", values = cbPalette[c(2,3,7,4)]) + xlab("")+ylab("Species Tree Estimation Error (QD)") +
+  #coord_cartesian(ylim=c(0.000001, 1)) #+ 
+  #guides(color=guide_legend(nrow = 2),) +
+  guides(color=F,) +
+  theme(legend.position = c(0.82,0.2),legend.background = element_blank(),
+        legend.box.background = element_rect(colour = "black"),
+        legend.title = element_blank(),
+        text = element_text(size=11),
+        panel.border = element_rect(fill="NA"),
+        panel.spacing = unit(1.5,"pt"),
+        strip.background = element_blank(),
+        strip.text.x = element_blank(),
+        axis.title.x=element_blank(),
+        axis.text.x=element_blank()) +
+  scale_x_discrete(position = "top") 
+
+
+ggsave("./figures/violin_stee_full_all_QD.pdf",width=9, height=3)
+
 
 
 #################################
@@ -1520,53 +1539,94 @@ dfm$mc = factor(dfm$mc,  levels=c("mc1", "mc2", "mc3-100", "mc3-200", "mc3-300",
 
 sz=100
 i="nRF"
-ggplot(dfm[dfm$size == sz,], aes(x = variable, y = value, fill=variable)) + 
-  facet_grid(.~mc) +
+ggplot(dfm[dfm$size == sz,], aes(x = mc, y = value, fill=variable)) + 
+  #facet_grid(.~mc) +
   #geom_text(data=z,aes(y=0.01, x=variable, label=con))+
-  geom_violin(scale = "count", trim = TRUE, draw_quantiles = c(0.25, 0.5, 0.75) ) + #facet_wrap(.~size)+
-  stat_summary()+theme_classic() +
+  geom_violin(scale = "count", trim = TRUE, draw_quantiles = c(0.25, 0.5, 0.75) , position = position_dodge(width = 0.75)) + #facet_wrap(.~size)+
+  stat_summary(position = position_dodge(width = 0.75))+theme_classic() +
   #scale_y_continuous(trans="log", breaks = c(0.01, 0.1, 0.8))+
-  theme(text = element_text(size=10), axis.text.x = element_text(angle=45, hjust=1)) +
-  scale_fill_manual(values = cbPalette[c(1,2,3)]) + xlab("")+ylab(sprintf("Gene Tree Discordance (%s)", i)) +
+  theme(legend.position = "top", text = element_text(size=10))+#, axis.text.x = element_text(angle=45, hjust=1)) +
+  scale_fill_manual(name="", values = cbPalette[c(1,2,3)]) + xlab("")+ylab(sprintf("Gene Tree Discordance (%s)", i)) #+
   #coord_cartesian(ylim=c(0.01, 0.8)) + 
-  guides(fill=F)
+  #guides(fill=F)
 
 
 ggsave(sprintf("./figures/violin_gene_discordance_%s_%s.pdf", i,sz),width=8, height=4)
 
-dfd <- dfall[,c("mc", "rep", "cluster", "gene", "size", "uDance-GTEE", "FastTree2-GTEE")]
-colnames(dfd) <- c("mc", "rep", "cluster", "gene", "size", "uDance", "FastTree2")
+
+sz=500
+i="nRF"
+ggplot(dfm[dfm$size == sz,], aes(x = mc, y = value, fill=variable)) + 
+  #facet_grid(.~mc) +
+  #geom_text(data=z,aes(y=0.01, x=variable, label=con))+
+  geom_violin(scale = "count", trim = TRUE, draw_quantiles = c(0.25, 0.5, 0.75), position = position_dodge(width = 0.8) ) + #facet_wrap(.~size)+
+  stat_summary(position = position_dodge(width = 0.8))+theme_classic() +
+  #scale_y_continuous(trans="log", breaks = c(0.01, 0.1, 0.8))+
+  theme(legend.position = "top", text = element_text(size=10))+#, axis.text.x = element_text(angle=45, hjust=1)) +
+  scale_fill_manual(name="", values = cbPalette[c(1,2,3)]) + xlab("")+ylab(sprintf("Gene Tree Discordance (%s)", i)) #+
+#coord_cartesian(ylim=c(0.01, 0.8)) + 
+#guides(fill=F)
 
 
-dfd <- melt(data=dfd, id=c("mc", "rep","cluster", "gene", "size"))
+ggsave(sprintf("./figures/violin_gene_discordance_%s_%s.pdf", i,sz),width=3, height=4)
+
+##################################################
+df <- read.table("./data/gtee_all_hgt.csv", header=F, sep="\t")
+head(df)
+colnames(df)=c("QD", "nRF", "size", "rep","cluster","gene","method","mc")
+df$mc=paste(df$mc, df$size,sep="-")
+#head(df[df$mc=="mc-5-100-500",])
+     
+dfd <- melt(data=df, id=c("mc", "rep","cluster", "gene", "size","method"))
+head(dfd)
+colnames(dfd) <- c("mc", "rep", "cluster", "gene", "size", "method","measure", "error")
+
 
 dfd$mc = as.factor(dfd$mc)
-levels(dfd$mc) = c("mc3-100", "mc3-200", "mc3-300", "mc3-400", "mc3-500", "mc1", "mc2")
-dfd$mc = factor(dfd$mc,  levels=c("mc1", "mc2", "mc3-100", "mc3-200", "mc3-300", "mc3-400", "mc3-500"))
+levels(dfd$mc) = c("LD-100", "MD-100", "MD-500", "HD-100", "HD-500", "HD-P1", "HD-P2", "HD-P3", "HD-P4", "HD-P5")
+dfd$method = as.factor(dfd$method)
+levels(dfd$method) = c("A","u" )
+dfd$method = factor(dfd$method, levels=c("u","A"))
 
-
-
-ggplot(dfd[dfd$size == sz, ], aes(x = variable, y = value, fill=variable)) + 
+dfd[dfd$measure=="QD" & dfd$error >= 0.67,]$error = 0.67
+ggplot(dfd[dfd$measure == "nRF",], aes(x = method, y = error, fill=method)) + 
   facet_grid(.~mc) +
   #geom_hline(yintercept = 0, color="red", linetype = 'dotted')+
   #geom_text(data=z,aes(y=0.01, x=variable, label=con))+
-  geom_violin(scale = "count", trim = TRUE, draw_quantiles = c(0.25, 0.5, 0.75) ) + #facet_wrap(.~size)+
-  stat_summary()+theme_classic() +
+  geom_violin( trim = TRUE, draw_quantiles = c(0.25, 0.5, 0.75), ) + #facet_wrap(.~size)+
+  stat_summary(size=0.4, position = position_dodge(width = 0.9))+theme_classic() +
   #scale_y_continuous(trans="log", breaks = c(0.01, 0.1, 0.8))+
-  theme(text = element_text(size=10), axis.text.x = element_text(angle=45, hjust=1)) +
-  scale_fill_manual(values = cbPalette[c(2,3,4)]) + xlab("")+ylab(sprintf("Gene Tree Estimation Error (%s)", i)) +
-  #coord_cartesian(ylim=c(0.01, 0.8)) + 
-  guides(fill=F)
+  theme(legend.position = c(0.05,0.85), 
+        text = element_text(size=10),
+        legend.background = element_blank(),
+        legend.box.background = element_blank(),
+        legend.key = element_blank(),
+        legend.key.size = unit(0.4, 'cm'),
+        legend.text = element_text(size=6))+#, axis.text.x = element_text(angle=45, hjust=1)) +
+  scale_fill_manual(name="",labels=c("RAxML-NG", "FT2"), values = cbPalette[c(2,3,4)]) + xlab("")+ylab(sprintf("Gene Tree Estimation Error (%s)", "nRF"))  +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE))#+
 
-# ggplot(dfd, aes(x = variable, y = value, fill=variable)) + 
-#   geom_violin(scale = "count", trim = TRUE, draw_quantiles = c(0.25, 0.5, 0.75) ) +  
-#   geom_hline(yintercept = 0, color="red", linetype = 'dotted')+
-#   facet_grid(.~mc)+
-#   stat_summary()+theme_classic() +
-#   scale_fill_manual(values = cbPalette[c(3,4)]) + xlab("Gene Tree Estimation Error")+ylab("nRF")
 
-ggsave("./figures/violin_gene_delta_nRF_500.pdf",width=3, height=4)
+ggsave("./figures/violin_gene_delta_nRF.pdf",width=8, height=3)
 
+ggplot(dfd[dfd$measure == "QD",], aes(x = method, y = error, fill=method)) + 
+  facet_grid(.~mc) +
+  #geom_hline(yintercept = 0, color="red", linetype = 'dotted')+
+  #geom_text(data=z,aes(y=0.01, x=variable, label=con))+
+  geom_violin( trim = TRUE, draw_quantiles = c(0.25, 0.5, 0.75), ) + #facet_wrap(.~size)+
+  stat_summary(size=0.4, position = position_dodge(width = 0.9))+theme_classic() +
+  #scale_y_continuous(trans="log", breaks = c(0.01, 0.1, 0.8))+
+  theme(legend.position = c(0.05,0.85), 
+        text = element_text(size=10),
+        legend.background = element_blank(),
+        legend.box.background = element_blank(),
+        legend.key = element_blank(),
+        legend.key.size = unit(0.4, 'cm'),
+        legend.text = element_text(size=6))+#, axis.text.x = element_text(angle=45, hjust=1)) +
+  scale_fill_manual(name="",labels=c("RAxML-NG", "FT2"), values = cbPalette[c(2,3,4)]) + xlab("")+ylab(sprintf("Gene Tree Estimation Error (%s)", "QD"))  +
+  guides(fill=guide_legend(nrow=2, byrow=TRUE))#+
+
+ggsave("./figures/violin_gene_delta_QD.pdf",width=8, height=3)
 
 
 ################################################
@@ -1580,26 +1640,20 @@ goodreps <- goodreps[goodreps %in% goodreps2]
 dfs <- df[df$rep %in% goodreps ,]
 
 dfs$Task = as.factor(dfs$Task)
-levels(dfs$Task) = c("APPLES-2", "ASTRAL", "ASTRAL", "ASTRAL", "FastTree-2", "IQTree", "IQTree", "RAxML-ng", "RAxML-ng" )
+levels(dfs$Task) = c("APPLES-2", "ASTRAL", "ASTRAL", "ASTRAL", "ASTRID", "FastTree-2", "IQTree", "IQTree", "RAxML-ng", "RAxML-ng" )
 #fd$mc = factor(dfd$mc,  levels=c("mc1", "mc2", "mc3-100", "mc3-200", "mc3-300", "mc3-400", "mc3-500"))
 
 dfs$method = as.factor(dfs$method)
-dfs$method = factor(dfs$method, levels=c("uDance", "FT2+ASTRAL", "concat"))
+levels(dfs$method) = c("C", "A", "D", "u")
+dfs$method = factor(dfs$method, levels=c("u", "A", "D", "C"))
 
-
-
-ggplot(aes(x=reorder(as.factor(rep),tottime), y=tottime, fill=Task), data=dfs) + geom_bar(position="stack", stat="identity") +
-  facet_wrap(size~method) + theme_classic() + scale_fill_brewer(palette="Set2") +
-  geom_text(data=dfs[dfs$method == "FT2+ASTRAL" & dfs$size == 500 ,],aes(y=10^6, x=as.factor(rep), label="X"), color="orange")+
-  ylab("Time (CPU seconds)") + xlab("Replicate ID") + #theme(axis.text.x = element_blank()) +
-  #scale_y_continuous(breaks = c(1000000, 2000000, 3000000, 4000000, 5000000, 6000000))
-  scale_y_continuous(labels = label_number(scale_cut = cut_short_scale()), 
-                    breaks = c(1000000, 2000000, 3000000, 4000000, 5000000, 6000000))
-
-ggsave("./figures/hgt_runtime_100.pdf",width=6, height=6)
 
 dfm <- read.table("./data/hgt_memory.csv", header=F)
 colnames(dfm) <- c("method", "rep", "size", "memory")
+
+dfm$method = as.factor(dfm$method)
+levels(dfm$method) = c("C", "A", "D", "u")
+dfs$method = factor(dfs$method, levels=c("u", "A", "D", "C"))
 
 ggplot(aes(x=method, y=tottime/3), data=dfs) + geom_bar(aes(fill=Task), position="stack", stat="identity") +
    theme_classic() + scale_fill_brewer(palette="Set2") + 
@@ -1608,14 +1662,14 @@ ggplot(aes(x=method, y=tottime/3), data=dfs) + geom_bar(aes(fill=Task), position
   #stat_summary(aes(y=memory*5*10^4), data = dfm, geom = "errorbar", width = .25, size=0.3)+
   facet_wrap(.~size)+
   geom_text(data=dfs[dfs$method == "FT2+ASTRAL" & dfs$size == 500 ,],aes(y=7*10^5, x=method, label="Fail"), color="orange")+
-  ylab("Cumulative time (CPU seconds)") + xlab("") + theme(legend.position = "left", axis.text.x = element_text(angle=45, hjust=1)) +
+  ylab("Cumulative time (CPU seconds)") + xlab("") + theme(legend.position = "left") +
   #scale_y_continuous(breaks = c(1000000, 2000000, 3000000, 4000000, 5000000, 6000000))
   scale_y_continuous(labels = label_number(scale_cut = cut_short_scale()), 
                      breaks = c(1000000, 2000000, 3000000, 4000000, 5000000, 6000000),
                      sec.axis = sec_axis(~.*20000, name="Peak memory", labels = scales::label_bytes()))
 
 
-ggsave("./figures/hgt_runtime_100_norep.pdf",width=5, height=4)
+ggsave("./figures/hgt_runtime_100_norep.pdf",width=4.5, height=3)
 
 
 df<-read.table("/Users/metin/Workspace/btol/wol2_cpureport.txt", sep=",")
@@ -1684,3 +1738,530 @@ ggplot(aes(x=cut(bl,qnt_fixed, include.lowest = T), y = qs),data=df) +
 
 ggsave("./figures/bl_vs_qs_16k.pdf",width=5, height=5.5)
 
+###################
+df <-read.table("./data/vsize_run_mem.csv", header=F)
+head(df)
+colnames(df) <- c("CPUsec", "peakmem", "method", "size")
+
+ggplot(data=df, aes(x=size, y=CPUsec, color=method)) + geom_point(aes(shape=method)) + 
+  stat_smooth(aes(linetype="Runtime"),data=df, method="lm",se=F) + 
+  scale_x_continuous(trans="log2",labels=comma) +  
+  scale_y_continuous(trans="log2",sec.axis = sec_axis(~./32,name="Memory"))+
+  #annotate(geom="text",label=format(lm(log(CPUsec)~log(size),df[ df$method == "concat",])[[1]][[2]],digits=2),color=cbPalette[2],x=35000,y=300000)+
+  #annotate(geom="text",label=format(lm(log(CPUsec)~log(size),df[ df$method == "FT2+ASTRAL",])[[1]][[2]],digits=2),color=cbPalette[3],x=2200,y=1200000)+
+  #annotate(geom="text",label=format(lm(log(CPUsec)~log(size),df[ df$method == "uDance",])[[1]][[2]],digits=2),color=cbPalette[4],x=85000,y=15000000)+
+  xlab("Output tree size") + ylab("CPU time (seconds)") + theme_classic() +
+  scale_colour_manual(name = "", values = cbPalette[c(2,3,4)])+
+  scale_shape_manual(name="",values = c(19, 18, 15, 4)) + 
+  stat_smooth( aes(size, peakmem*32, colour = method, shape=method, linetype="Memory"),
+               data=df,method="lm",se=F) + 
+  geom_point(aes(size, peakmem*32, color = method, shape=method),
+             data=df,stat="summary",shape=5,fill="white",size=1.6) + 
+  annotation_logticks(sides="lr") + 
+  guides(color=guide_legend(nrow=1,byrow=T))+
+  theme(legend.position = "top")+
+  scale_linetype_manual(name="", values = c(1,3,1))
+  
+  
+################################
+
+df <-read.table("data/lgrates_all.csv", header=F)
+colnames(df) <- c("catid", "rate", "partition", "gene", "tree")
+
+
+df2 = df[df$tree == "16k" & df$catid == 1 & df$partition != 12,]
+df2$partition = as.factor(df2$partition)
+ 
+ggplot(aes(x=reorder(gene,-rate),y=partition, fill=rate-min(df2$rate)), data=df2) +  
+   geom_tile(color="#BBBBBB") + theme_classic()+
+  scale_fill_gradient2(name= "Rate   ", 
+                      low = "#FFFFCC",
+                      mid = "#FF0000",
+                      midpoint=0.4,
+                      high = "#000000",
+                      breaks=c(0,0.2,0.4,0.6,0.8)-min(df2$rate),
+                      labels=function(x) x+min(df2$rate))+   
+  #scale_fill_gradient2(name="",low="#FFFFFF", 
+  #                     mid="#777777",midpoint = .5 , 
+  #                     high = "#000000")+
+  theme(legend.position="top", 
+        text = element_text(size=12), 
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        strip.background = element_blank(),
+        strip.text.y = element_blank()) + 
+  guides(fill = guide_colourbar(barwidth = 10, barheight = 0.5 )) +
+  xlab("")+ylab("") 
+
+
+
+ggsave("./figures/lgrates1_new.pdf",width=12, height=4)
+
+
+df2 = df[df$tree == "16k" & df$catid == 4 & df$partition != 12,]
+df2$partition = as.factor(df2$partition)
+
+ 
+#ggplot(aes(x=reorder(gene,-rate),y=partition, fill=rate), data=df2) +  
+#  geom_tile(color="#BBBBBB") + theme_classic()+
+#  scale_fill_gradient(name= "Rate   ", 
+#                       low = "#FFFFCC",
+#                       high = "#FF0000") +
+#  #scale_fill_gradient2(name="",low="red", 
+#  #                     mid="yellow",midpoint = .5 , 
+#  #                     high = "#007f00")+
+#  theme(legend.position="top", 
+#        text = element_text(size=12), 
+#        axis.text.x = element_blank(),
+#        strip.background = element_blank(),
+#        strip.text.y = element_blank()) + 
+#  guides(fill = guide_colourbar(barwidth = 10, barheight = 0.5)) +
+#  xlab("")+ylab("") 
+
+
+ggplot(aes(x=reorder(gene,rate),y=partition, fill=rate), data=df2) +  
+  geom_tile(color="#BBBBBB") + theme_classic()+
+  scale_fill_gradient2(name= "Rate   ", 
+                       high = "#FFFFCC",
+                       mid = "#FF0000",
+                       midpoint=1.7,
+                       low = "#000000",
+                       breaks=c(1.2,1.6,2.0,2.4,2.8, 3.2),
+                       labels=function(x) x)+   
+  #scale_fill_gradient2(name="",low="#FFFFFF", 
+  #                     mid="#777777",midpoint = .5 , 
+  #                     high = "#000000")+
+  theme(legend.position="top", 
+        text = element_text(size=12), 
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        strip.background = element_blank(),
+        strip.text.y = element_blank()) + 
+  guides(fill = guide_colourbar(barwidth = 10, barheight = 0.5 )) +
+  xlab("")+ylab("") 
+
+
+ggsave("./figures/lgrates4_new.pdf",width=12, height=4)
+
+
+##############33 
+
+df <- read.table("data/lpps_noblrees.csv", header=F)
+colnames(df) <- c("lpp", "Tree")
+
+ggplot(data=df, aes(color=Tree,x=lpp)) + stat_ecdf() + theme_classic() +
+  xlab("Local posterior probability") + ylab("ECDF")
+
+df <-read.table('data/lpp_200k.csv', header=F)
+colnames(df) <- c("lpp", "Tree", "cluster")
+
+ggplot(data=df, aes(color=as.factor(cluster%%10),x=lpp)) + stat_ecdf() + theme_classic() +
+  facet_wrap(.~cluster%/%10)+scale_color_brewer(palette="Spectral")+
+  xlab("Local posterior probability") + ylab("ECDF")
+
+summr <- dcast(data=df, cluster~.)
+
+ggsave("./figures/lpp_undance_compare.pdf",width=5, height=4.5)
+
+
+df2 <-read.table("data/200k_diversity.csv", header=F)
+head(df2)
+colnames(df2) <- c("diversity", "cluster")
+mgd <- merge(merge(df,df2,by="cluster"),dcast(data=df, cluster~'count'),by="cluster")
+head(mgd)
+
+ggplot(data=mgd, aes(linetype=cut(diversity,5),color=as.factor(cluster%/%10),x=lpp)) + stat_ecdf() + theme_classic() +
+  facet_wrap(.~cluster%%10)+#scale_color_brewer(palette="Set2")+
+  xlab("Local posterior probability") + ylab("ECDF")
+
+
+ggsave("./figures/lpp_each_cluster_ecdf.pdf",width=10, height=6)
+
+ggplot(data=mgd, aes(x=diversity,y=lpp,color=cut(count,breaks=c(1200,1800,2500,6000)))) + 
+  stat_summary(alpha=0.7, fun.data = function(x) data.frame(ymin=quantile(x,0.25), ymax=quantile(x,0.75), y=median(x))) + 
+  theme_classic() + 
+  scale_x_continuous(trans = "log10")+
+  stat_smooth(se=F, color="red") +
+  scale_color_brewer(name="Size", palette="Dark2")+
+  xlab("Average branch length") + ylab("Local posterior probability") #+ geom_text(position=position_jitter(width = 0),aes(label=cluster,x=diversity,y=0.4), color="black",data=df2)
+
+ggplot(data=mgd, aes(x=lpp,group = cluster, color=as.factor(cluster))) + 
+  stat_ecdf()+
+  scale_color_discrete(name="Partition")+
+  theme_classic() +
+  ylab("ECDF") + xlab("Local posterior probability")
+
+
+ggsave("./figures/lpp_16k_ecdf.pdf",width=6, height=5.5)
+
+ggplot(data=mgd, aes(x=as.factor(cluster),y=lpp, color=count)) + 
+  geom_boxplot()+
+  scale_color_binned(name="Partition")+
+  theme_classic() 
+
+ggsave("./figures/lpp_average_bl.pdf",width=8, height=4)
+
+
+#############TEMP-ACCURACY###################
+df <-read.table("./data/vsize_notime.csv", header=F)
+colnames(df) <- c("qd","rf","method","size")
+head(df)
+
+ggplot(aes(color=method, x=size/1000, y=rf), data=df) + geom_path() + theme_classic() +
+  xlab("Size (x 1000)") + ylab("nRF") + scale_x_continuous(trans="log2", breaks = c(0.5,1,2,4,8,16,32,64))+
+  scale_color_manual(name="", values = cbPalette[c(4,3,2)])+ coord_cartesian(ylim = c(0,0.22))+
+  theme(legend.position = c(0.8,0.8))
+
+ggsave("./figures/vsize_nRF.pdf",width=3.5, height=3.5)
+
+ggplot(aes(color=method, x=size/1000, y=qd), data=df) + geom_path() + theme_classic() +
+  xlab("Size (x 1000)") + ylab("QD")+ scale_x_continuous(trans="log2", breaks = c(0.5,1,2,4,8,16,32,64))+
+  scale_color_manual(name="", values = cbPalette[c(4,3,2)])+ coord_cartesian(ylim = c(0,0.025))+
+  theme(legend.position = "None")
+
+ggsave("./figures/vsize_qd.pdf",width=3.5, height=3.5)
+
+##############RUNTIME######################
+
+df <-read.table("./data/vsize_incremental_combined.csv", header=F)
+colnames(df) <- c("qd","rf","method","size","time","memory")
+head(df)
+
+ggplot(aes(color=method, x=size/1000, y=time/60/60), data=df) + geom_path() + theme_classic() +
+  xlab("Size (x 1000)") + ylab("Time (CPU hours)")+ scale_x_continuous(trans="log2", breaks = c(0.5,1,2,4,8,16,32,64))+
+  theme(legend.position = "None") + scale_y_continuous(trans="log2") +
+  scale_color_manual(name="", values = cbPalette[c(4,3,2)])+
+  annotate(geom="text",label=format(lm(log(time/60/60)~log(size),df[df$method == "concat",])[[1]][[2]],digits=3),color=cbPalette[4],x=32000/1000,y=30) +
+  annotate(geom="text",label=format(lm(log(time/60/60)~log(size),df[df$method == "FT2+ASTRAL",])[[1]][[2]],digits=3),color=cbPalette[3],x=2000/1000,y=320)+
+  annotate(geom="text",label=format(lm(log(time/60/60)~log(size),df[df$method == "uDance",])[[1]][[2]],digits=3),color=cbPalette[2],x=64000/1000,y=2600)
+
+  
+
+ggsave("./figures/vsize_runtime.pdf",width=3.5, height=3.5)
+
+
+
+ggplot(aes(color=method, x=size/1000, y=memory/1000), data=df) + geom_path() + theme_classic() +
+  xlab("Size (x 1000)") + ylab("Memory (GB)")+ scale_x_continuous(trans="log2", breaks = c(0.5,1,2,4,8,16,32,64))+
+  theme(legend.position = "None") + scale_y_continuous() +
+  scale_color_manual(name="", values = cbPalette[c(4,3,2)])
+
+ggsave("./figures/vsize_memory.pdf",width=3.5, height=3.5)
+
+dfc <- read.table("./data/clocktimes.csv", header=F)
+colnames(dfc) <- c("wtime","size","method")
+
+ggplot(aes(color=method, x=size/1000, y=wtime/60/60), data=dfc) + geom_path() + theme_classic() +
+  xlab("Size (x 1000)") + ylab("Time (Wall-clock hours)")+ scale_x_continuous(trans="log2", breaks = c(0.5,1,2,4,8,16,32,64))+
+  theme(legend.position = "None") + scale_y_continuous(trans="log2") +
+  scale_color_manual(name="", values = cbPalette[c(4,3,2)]) +
+  annotate(geom="text",label=format(lm(log(wtime/60/60)~log(size),dfc[dfc$method == "concat",])[[1]][[2]],digits=3),color=cbPalette[4],x=32000/1000,y=26) +
+  annotate(geom="text",label=format(lm(log(wtime/60/60)~log(size),dfc[dfc$method == "FT2+ASTRAL",])[[1]][[2]],digits=3),color=cbPalette[3],x=2000/1000,y=20)+
+  annotate(geom="text",label=format(lm(log(wtime/60/60)~log(size),dfc[dfc$method == "uDance",])[[1]][[2]],digits=3),color=cbPalette[2],x=64000/1000,y=19)
+
+ 
+ggsave("./figures/vsize_wallclock.pdf",width=3.5, height=3.5) 
+
+
+ggplot(data=df, aes(x=size/1000, y=time/60/60, color=method)) + geom_point(aes(shape=method)) + 
+  stat_smooth(aes(linetype="CPUtime"),data=df, method="lm",se=F) + 
+  scale_x_continuous(trans="log2", breaks = c(0.5,1,2,4,8,16,32,64)) +  
+  annotate(geom="text",label=format(lm(log(wtime/60/60)~log(size),dfc[dfc$method == "concat",])[[1]][[2]],digits=3),color=cbPalette[4],x=64000* 1.3/1000,y=50) +
+  annotate(geom="text",label=format(lm(log(wtime/60/60)~log(size),dfc[dfc$method == "FT2+ASTRAL",])[[1]][[2]],digits=3),color=cbPalette[3],x=2000*1.4/1000,y=20)+
+  annotate(geom="text",label=format(lm(log(wtime/60/60)~log(size),dfc[dfc$method == "uDance",])[[1]][[2]],digits=2),color=cbPalette[2],x=64000*1.3/1000,y=19)+ 
+  annotate(geom="text",label=format(lm(log(time/60/60)~log(size),df[df$method == "concat",])[[1]][[2]],digits=3),color=cbPalette[4],x=64000*1.3/1000,y=160) +
+  annotate(geom="text",label=format(lm(log(time/60/60)~log(size),df[df$method == "FT2+ASTRAL",])[[1]][[2]],digits=3),color=cbPalette[3],x=2000*1.4/1000,y=320)+
+  annotate(geom="text",label=format(lm(log(time/60/60)~log(size),df[df$method == "uDance",])[[1]][[2]],digits=3),color=cbPalette[2],x=64000*1.3/1000,y=4096)+
+  xlab("Size (x 1000)") + ylab("Time (CPU hours)") + theme_classic() +
+  scale_colour_manual(name = "", values = cbPalette[c(4,3,2)])+
+  scale_y_continuous(trans="log2",sec.axis = sec_axis(~./1,name="Time (Wall-clock hours)")) +
+  stat_smooth( aes(size/1000, 1*wtime/60/60, colour = method, linetype="Clocktime"),
+               data=dfc,method="lm",se=F) + 
+  geom_point(aes(size/1000, 1*wtime/60/60, color = method, shape=method),
+             data=dfc,stat="summary",fill="white",size=1.6) + 
+  scale_shape_manual(name="",values = c(19, 18, 15, 4)) + 
+  #annotation_logticks(sides="lr") + 
+  guides(color=guide_legend(nrow=1,byrow=T))+
+  theme(legend.position = "top")+
+  scale_linetype_manual(name="", values = c(1,3,1)) 
+
+ggsave("./figures/vsize_cpu_wallclock.pdf",width=5, height=4) 
+
+
+df <-read.table("./data/vsize_incremental_rep2.csv", header=F)
+colnames(df) <- c("qd","rf","size","method")
+head(df)
+
+ggplot(aes(color=method, x=size, y=rf), data=df) + geom_path() + theme_classic() +
+  xlab("Size") + ylab("nRF") + scale_x_continuous(trans="log2", breaks = c(500,1000,2000,4000,8000))+
+  scale_color_manual(name="", values = cbPalette[c(2,4)])+
+  theme(legend.position = c(0.8,0.8))
+
+ggsave("./figures/vsize_nRF_rep2.pdf",width=5, height=5)
+
+
+ggplot(aes(color=method, x=size, y=qd), data=df) + geom_path() + theme_classic() +
+  xlab("Size") + ylab("QD") + scale_x_continuous(trans="log2", breaks = c(500,1000,2000,4000,8000,16000,32000))+
+  scale_color_manual(name="", values = cbPalette[c(2,4)])+
+  theme(legend.position = c(0.8,0.2))
+
+
+ggsave("./figures/vsize_QD_rep2.pdf",width=5, height=5)
+
+
+
+df <-read.table("data/vsize_10rep.csv", header=F)
+head(df)
+colnames(df) <- c("qd","rf","size","method","rep")
+ggplot(aes(color=method, x=as.factor(size), y=qd), data=df) + geom_boxplot() + theme_classic() +
+  xlab("Size") + ylab("QD")+ #+ scale_x_continuous(trans="log2", breaks = c(500,1000,2000,4000,8000,16000,32000))+
+  scale_color_manual(name="", values = cbPalette[c(4,2)])+
+  theme(legend.position = "right")
+
+ggsave("./figures/vsize_QD_10rep.pdf",width=6, height=5)
+
+ggplot(aes(color=method, x=as.factor(size), y=rf), data=df) + geom_boxplot() + theme_classic() +
+  xlab("Size") + ylab("nRF")+ #+ scale_x_continuous(trans="log2", breaks = c(500,1000,2000,4000,8000,16000,32000))+
+  scale_color_manual(name="", values = cbPalette[c(4,2)])+
+  theme(legend.position = "right")
+
+
+
+ggsave("./figures/vsize_nRF_10rep.pdf",width=6, height=5)
+###############################
+
+df <- read.table("data/ppscomp.csv", header=F)
+
+
+colnames(df) <- c("pp","method")
+
+
+ggplot(aes(color=method, x=pp), data=df) + stat_ecdf() + theme_classic()
+
+
+###########################
+
+
+df <-read.table("data/smallinsert_runtime.csv", header=F)
+head(df) 
+
+colnames(df) = c("time", "memory", "method", "qsize", "mode")
+
+df2 <-read.table("data/smallinsert_acc.csv", header=F)
+head(df2)
+
+colnames(df2) = c("delta", "error", "bberror", "dk","mode","qsize", "method")
+df2$method = as.factor(df2$method)
+levels(df2$method) = c("APPLES2","udance.incremental","udance.maxqs")
+
+df3 <- merge(df, df2, by=c("mode", "qsize", "method"))
+
+head(df3)
+
+df3$mode = as.factor(df3$mode)
+levels(df3$mode) = c("auto", "fast")
+df3$fmethod = paste(df3$method, df3$mode,sep="-")
+head(df3)
+df3 = df3[df3$fmethod != "APPLES2-fast",]
+
+ggplot(data=df3, aes(y=delta,x=time/60/60, color=fmethod))+ 
+  stat_summary(fun.y = mean, geom = "point") +
+  stat_summary(fun.y="mean", geom="line", aes(group=fmethod))+
+  scale_x_continuous(trans="log", breaks=c(10, 40, 160, 640,2560))+
+  xlab("CPU hours")+
+  #facet_wrap(nrow=1, .~qsize) + 
+  theme_classic()
+
+ggplot(data=df3, aes(x=as.factor(qsize),y=delta, color=fmethod))+ 
+  #geom_boxplot()+
+  stat_summary(aes(size=time/60/60),fun.y = mean, alpha=0.5, position = position_dodge(width = 0.7)) +
+  #stat_summary(fun.y="mean", geom="line", aes(group=fmethod))+
+  scale_size_area(max_size = 3)+
+  #scale_x_continuous(trans="log", breaks=c(10, 40, 160, 640,2560))+
+  xlab("CPU hours")+
+  #facet_wrap(nrow=1, .~qsize) + 
+  theme_classic()
+
+
+ggplot(data=merge(
+  dcast(df3,qsize+fmethod~"delta",value.var = "delta",fun.aggregate = mean),
+  dcast(df3,qsize+fmethod~"time",value.var = "time",fun.aggregate = mean)), 
+  aes(x=as.factor(qsize),y=time/60/60, shape=fmethod,
+      fill=cut(delta,breaks=c(4,2,1,0,0.5,-1,-4,-8,-16,-32,-64)),
+      color=cut(delta,breaks=c(4,2,1,0,0.5,-1,-4,-8,-16,-32,-64))))+ 
+  #geom_boxplot()+
+  stat_summary(aes(group=fmethod),color="gray30",size=0.1,
+               position = position_dodge(width = 0.7),geom="line") +
+  stat_summary(position = position_dodge(width = 0.7),geom="point",size=2.75,color="black") +
+  stat_summary(position = position_dodge(width = 0.7),geom="point",size=2) +
+    #stat_summary(fun.y="mean", geom="line", aes(group=fmethod))+
+  #scale_size_area(max_size = 3)+
+  #scale_fill_binned(breaks=c(3,0,-1,-2,-4,-10,-50))+
+  #scale_fill_gradient2(midpoint  = -10,high="#FF0000",mid="#4455EE", low="#00EE55")+
+  #scale_x_continuous(trans="log", breaks=c(10, 40, 160, 640,2560))+
+  scale_fill_brewer(name="Mean delta error", palette = "Spectral",direction=-1)+
+  scale_color_brewer(name="Mean delta error", palette = "Spectral",direction=-1)+
+  xlab("Number of queries")+   
+  scale_y_continuous(name="CPU time (hours)",trans="identity")+
+  scale_shape_manual(name="", values=c(21,23,24,22,25))+
+  #facet_wrap(nrow=1, .~qsize) + 
+  theme_classic()+
+  theme(legend.position = c(0.22,.65))
+
+
+ggsave("./figures/smallinsert_paths.pdf",width=7, height=7)
+
+df4 <- read.table("./data/smallinsert_acc_qdrf.csv", header=F)
+colnames(df4) = c("qd", "rf", "qsize", "mode","method")
+head(df4)
+
+df5 <- merge(df, df4, by=c("mode", "qsize", "method"))
+df5$mode = as.factor(df5$mode)
+levels(df5$mode) = c("auto", "fast")
+df5$fmethod = paste(df5$method, df5$mode,sep="-")
+df5 = df5[df5$fmethod != "APPLES2-fast",]
+
+ggplot(data=df5, aes(y=rf,x=time/60/60, color=fmethod))+ #stat_summary(fun.y = mean, geom = "point") +
+  #stat_summary(fun.y="mean", geom="line", aes(group=fmethod))+
+  geom_point()+ geom_line()+
+  scale_x_continuous(trans="log", breaks=c(10, 40, 160, 640,2560))+
+  xlab("CPU hours")+
+  #facet_wrap(nrow=1, .~qsize) + 
+  theme_classic()
+
+  #acc_sca$selection=as.factor(acc_sca$selection)
+#levels(acc_sca$selection) <- c("best","random")
+
+aggdata <- aggregate(df3, by=list(df3$fmethod, df3$qsize), FUN= function(c)sum(c==0)/sum(c>=0))
+aggdata$Algorithm  = aggdata$Group.1
+aggdata$size  = aggdata$Group.2
+head(aggdata)
+
+aggdata2 <- aggregate(df3, by=list(df3$fmethod, df3$qsize), FUN=mean)
+aggdata2$Algorithm  = aggdata2$Group.1
+aggdata2$size  = aggdata2$Group.2
+head(aggdata2)
+
+ggplot(data=df, aes(y=qsize, y=time/60/60/24)) + geom_path() +
+  scale_x_continuous(trans="log", breaks=c(5,10,20,40,80,160,320,640,1280)) +
+  ylab("CPU hours")+ xlab("Number of queries") + theme_classic()
+
+ggsave("./figures/smallinsert.pdf",width=5, height=5)
+
+
+
+##########################
+
+df2 <-read.table("data/all_delta_errs.csv", header=F)
+head(df2)
+colnames(df2) = c("error", "rfpl", "rfbb","query","qsize","method")
+ggplot(data=df2, aes(color=method, x=as.factor(qsize),y=rfpl)) + geom_violin(draw_quantiles=c(0.25, 0.5, 0.75)) + 
+  theme_classic() #+ coord_cartesian(ylim= c(0,2))
+
+
+########################
+
+df <-read.table("data/16internalexternal.csv",header=F,sep=',')
+#ggplot(data=df,aes(x=V1,fill=V2, y=V2)) + geom_violin(trim = FALSE,draw_quantiles = c(0.25, 0.5, 0.75)) + theme_classic() + xlab("BL")
+df[df$V3=="sim",]$V1 = df[df$V3=="sim",]$V1/mean(df[df$V3=="sim",]$V1)
+df[df$V3=="real",]$V1 = df[df$V3=="real",]$V1/mean(df[df$V3=="real",]$V1)
+df[df$V3=="sim-inf",]$V1 = df[df$V3=="sim-inf",]$V1/mean(df[df$V3=="sim-inf",]$V1)
+ggplot(data=df,aes(x=V1,color=V3, linetype=V2)) + stat_ecdf() + theme_classic()
+
+ggsave("./figures/internal-external-ratio.pdf",width=5.5, height=5)
+
+
+ggplot(data=df,aes(x=V1,fill=V2, y=V2)) +  facet_grid(V3~.) + 
+  geom_violin(trim = FALSE)+#,draw_quantiles = c(0.25, 0.5, 0.75)) + 
+  geom_boxplot(width=.1,outlier.size = 0) +
+  theme_bw() + xlab("BL")
+
+ggsave("./figures/internal-external-ratio-violin.pdf",width=5.5, height=5)
+
+############################
+df <- read.table("./data/bratiosl_level.csv", header=F)
+head(df)
+
+colnames(df) <- c("level", "ratio", "denom", "datatype")
+ggplot(df, aes(x = level, y = log10(ratio))) + 
+  facet_grid(.~denom) +
+  #geom_text(data=z[z$mc != "mc3-500",],aes(y=0.02, x=mc, label=con, color=variable),position = position_dodge(width = 0.7))+
+  geom_point(alpha=0.5,aes(color=datatype), position = position_dodge(width = 0.7)) + #facet_wrap(.~size)+
+  geom_hline(yintercept = 0, linetype="dotted") + 
+  #geom_errorbar(aes(xmin = value - std.err, xmax = estimate + std.error), width = 0.3)+
+  stat_summary( aes(group=datatype), position = position_dodge(width = 0.7), geom = "errorbar", fun.min = mean, fun = mean, fun.max = mean, width = .5)+
+  stat_summary( aes(group=datatype), position = position_dodge(width = 0.7), geom = "errorbar", width = .25, size=0.3)+
+  coord_cartesian(ylim = c(-1,1))+
+  theme_classic() +
+  #scale_y_continuous(trans="sqrt", breaks = c(0.04,  0.06,  0.08,0.1 ))+
+  theme(legend.position = "right", text = element_text(size=11), )+#axis.text.x = element_text(angle=45, hjust=1)) +
+  scale_color_manual(name="", values = cbPalette[c(2,3,4)]) + xlab("Branch Level")+ylab("Log Normalized BL") #+
+
+ggsave("./figures/bratios_levels.pdf",width=6, height=4)
+
+ggplot(df[df$denom == "all" & df$level <= 4,], aes( x = log10(ratio), color=datatype)) + 
+  #facet_grid(.~denom) +
+  #geom_text(data=z[z$mc != "mc3-500",],aes(y=0.02, x=mc, label=con, color=variable),position = position_dodge(width = 0.7))+
+  #geom_point(alpha=0.5,aes(color=datatype), position = position_dodge(width = 0.7)) + #facet_wrap(.~size)+
+  geom_density()+
+  geom_vline(xintercept = 0, linetype="dotted") + 
+  #geom_errorbar(aes(xmin = value - std.err, xmax = estimate + std.error), width = 0.3)+
+  #stat_summary( aes(group=datatype), position = position_dodge(width = 0.7), geom = "errorbar", fun.min = mean, fun = mean, fun.max = mean, width = .5)+
+  #stat_summary( aes(group=datatype), position = position_dodge(width = 0.7), geom = "errorbar", width = .25, size=0.3)+
+  coord_cartesian(xlim = c(-1,1))+
+  theme_classic() +
+  #scale_y_continuous(trans="sqrt", breaks = c(0.04,  0.06,  0.08,0.1 ))+
+  theme(legend.position = c(0.15,0.85), text = element_text(size=11), )+#axis.text.x = element_text(angle=45, hjust=1)) +
+  scale_color_manual(name="", values = cbPalette[c(2,3,4)]) + ylab("Density")+xlab("Log Normalized BL") #+
+
+ggsave("./figures/bratios_levels_new.pdf",width=4, height=4)
+
+##############################
+
+df <- read.table("./data/subs_collapse.csv", header=F)
+head(df)
+colnames(df) <- c("numspecies", "numinternal", "collapse",  "tree")
+
+df$ratio = df$numinternal/(df$numspecies-1)
+ggplot(df,aes(color=tree, y=ratio, x=collapse)) + geom_line(aes(group=tree)) + theme_classic() +
+  xlab("Branch support collapse threshold") +
+  ylab("Proportion of remaining branches") +
+  scale_color_manual(name="", values = cbPalette[c(2,3,4)]) +
+  theme(legend.position = c(0.15,0.15), text = element_text(size=11), )
+
+ggsave("./figures/support_collapse.pdf",width=4, height=4) 
+
+ggplot(df,aes(color=tree, y=numinternal, x=collapse)) + geom_line(aes(group=tree)) + theme_classic() +
+  xlab("Branch support collapse threshold") +
+  ylab("Number of remaining branches") +
+  scale_color_manual(name="", values = cbPalette[c(2,3,4)]) +
+  theme(legend.position = c(0.85,0.85), text = element_text(size=11), )
+
+ggsave("./figures/support_collapse_absolute.pdf",width=4, height=4) 
+
+
+###################33
+
+df <- read.table("./data/discacross.csv", header=F)
+head(df)
+colnames(df) <- c("QD","nRF","gene","rep","dataset")
+
+#df$dataset = as.factor(df$dataset)
+#levels(df$dataset) = c("10k", "MD-500","HD-500")
+
+ggplot(data=df, aes(color=dataset,x=nRF)) + geom_density() + theme_classic() + xlab("Error (nRF)") + 
+  theme(legend.position = c(0.85,0.85), text = element_text(size=11), )
+ggsave("./figures/discacross.pdf",width=4, height=4) 
+
+###########################
+
+df <- read.table("./data/discacross_hds.csv", header=F)
+head(df)
+colnames(df) <- c("QD","nRF","gene","rep","dataset")
+
+df$dataset = as.factor(df$dataset)
+levels(df$dataset) = c("HD-P1", "10k", "HD-P2","HD-P3","HD-P4","HD-P5")
+
+ggplot(data=df, aes(color=dataset,x=nRF)) + geom_density() + theme_classic() + xlab("Error (nRF)") + 
+  theme(legend.position = c(0.85,0.85), text = element_text(size=11), )
+ggsave("./figures/discacross_hdps.pdf",width=4, height=4) 
